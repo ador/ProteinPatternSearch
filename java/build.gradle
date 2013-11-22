@@ -1,0 +1,37 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'application'
+
+//mainClassName = 'runner.ExperimentRunner'
+//defaultTasks 'clean', 'test', 'run', 'jar', 'distZip'
+
+test {
+  testLogging.showStandardStreams = true
+}
+
+repositories {
+  mavenLocal()
+  mavenCentral()
+}
+
+dependencies {
+//  compile 'org.neo4j:neo4j-kernel:2.0.0-M03'
+//  compile 'org.neo4j:neo4j-lucene-index:2.0.0-M03'
+//  compile 'org.apache.lucene:lucene-core:3.6.2'
+//  compile 'com.tinkerpop.blueprints:blueprints-neo4j-graph:2.3.0'
+//  compile 'com.thinkaurelius.titan:titan:0.3.1'
+  compile 'nz.ac.waikato.cms.weka:weka-stable:3.6.6'
+  compile 'org.apache.commons:commons-lang3:3.0'
+  testCompile 'junit:junit:4.11'
+}
+
+//task(runSimple, dependsOn: 'classes', type: JavaExec) {
+//  main = 'hu.sztaki.example.Main'
+//  classpath = sourceSets.main.runtimeClasspath
+//}
+
+task copyToLib(type: Copy) {
+    into "$buildDir/output/lib"
+    from configurations.runtime
+}
+
