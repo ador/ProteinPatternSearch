@@ -156,9 +156,9 @@ public class SwissprotReaderTest {
 
       assertEquals(
           "FT   CHAIN         1     90       Uncharacterized protein IIV3-013L.", p2
-              .getLines("FT").get(0));
+              .getLines("FT", "CHAIN").get(0));
       assertEquals("FT   TRANSMEM     52     72       Helical; (Potential).", p2
-          .getLines("FT").get(2));
+          .getLines("FT", "TRANSMEM").get(0));
 
     } catch (IOException e) {
       e.printStackTrace();

@@ -42,7 +42,14 @@ public class ProteinSequence {
       FastaWriter fastaWriter = new FastaWriter(outFasta);
 
       Protein prot = swissReader.getNextProtein();
-      boolean beginsInside = hmmReader.getNextProteinBeginsInside();
+      boolean beginsInsideHmmTopPred = hmmReader.getNextProteinBeginsInside();
+      // TODO : overwrite hmmTop's result if the swissprot dat file contains 
+      // information about this (FT  TOPO_DOM  Extracellular../Cytoplasmic..)
+      boolean beginsInside = beginsInsideHmmTopPred;
+      if (prot.hasTmOrientationInfo()) {
+        //boolean beginsInside = prot.getBeginsInside;
+      }
+      
       int counter = 1;
       while (prot != null) {
         prot.setBeginsInside(beginsInside);

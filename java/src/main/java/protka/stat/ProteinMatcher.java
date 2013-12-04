@@ -29,7 +29,7 @@ public class ProteinMatcher {
   }
   
   public boolean match(Protein p) {
-    for (String s: p.getLines(rowType)) {
+    for (String s: p.getLines(rowType, "")) {
       if (s.contains(pattern)) {
         return true;
       }

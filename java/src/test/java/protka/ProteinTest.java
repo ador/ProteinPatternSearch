@@ -54,6 +54,7 @@ public class ProteinTest {
     List<String> lines3 = new ArrayList<String>();
     lines3.add("ID   001R_FRG3G              Reviewed;         256 AA.");
     lines3.add("AC   Q6GZX4;");
+    lines3.add("FT   TOPO_DOM    88   239       Cytoplasmic (Potential).");
     lines3.add("FT   TRANSMEM   240   250       Helical; (Potential).");
     lines3.add("SQ   SEQUENCE   256 AA;  29735 MW;  B4840739BF7D4121 CRC64;");
     lines3.add("     MAFSAEDVLK EYDRRRRMEA LLLSLYYPND RKLLDYKEWS PPRVQVECPK "
@@ -73,8 +74,11 @@ public class ProteinTest {
     lines4.add("FT   CHAIN         1    261       RPII140-upstream gene "
         + "protein.");
     lines4.add("FT                                /FTId=PRO_0000064352.");
+    lines4.add("FT   TOPO_DOM     40     66       Extracellular (Potential).");
     lines4.add("FT   TRANSMEM     67     87       Helical; (Potential).");
+    lines4.add("FT   TOPO_DOM     88    130       Cytoplasmic (Potential).");    
     lines4.add("FT   TRANSMEM    131    151       Helical; (Potential).");
+    lines4.add("FT   TOPO_DOM    152    182       Extracellular (Potential).");
     lines4.add("FT   TRANSMEM    183    203       Helical; (Potential).");
     lines4.add("FT   CONFLICT     64     64       S -> F (in Ref. 1; "
         + "AAD40352).");
@@ -177,5 +181,15 @@ public class ProteinTest {
     SequencePart seqPart = protein4.getSeqForTmPart(0);
     assertEquals(1, seqPart.getFrom());
     assertEquals(87, seqPart.getTo());
+  }
+  
+  @Test
+  public void testTmOriantation() {
+    assertFalse(protein1.hasTmOrientationInfo());
+    assertFalse(protein2.hasTmOrientationInfo());
+    assertTrue(protein3.hasTmOrientationInfo());
+    assertTrue(protein3.getBeginsInside());
+    assertTrue(protein4.hasTmOrientationInfo());
+    assertFalse(protein4.getBeginsInside());
   }
 }

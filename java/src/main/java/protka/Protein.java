@@ -8,9 +8,10 @@ public class Protein {
   private List<String> lines = new ArrayList<String>();
   private String sequence = "";
   public String acNum;
-  private List<SequencePart> tmNums = null;
+  private List<SequencePart> tmNums;
   private static int MINLENGTH;
   private static int MAXLENGTH;
+  private List<SequencePart> allDomains;
 
   public static void setMinLength(int length) {
     MINLENGTH = length;
@@ -52,6 +53,7 @@ public class Protein {
         acNum = id.split(";")[0];
       }
     }
+    readDomains();
   }
 
   // returns the first matching line, or null if no match
@@ -65,10 +67,10 @@ public class Protein {
   }
 
   // returns all matching lines, or empty list if no match
-  public List<String> getLines(String startsWith) {
+  public List<String> getLines(String startsWith, String contains) {
     ArrayList<String> ret = new ArrayList<String>();
     for (String line : lines) {
-      if (line.startsWith(startsWith)) {
+      if (line.startsWith(startsWith) && line.contains(contains)) {
         ret.add(line);
       }
     }
@@ -80,18 +82,15 @@ public class Protein {
   }
 
   public List<SequencePart> getTmNumbers() {
-    if (tmNums == null) {
-      readTmNumbers();
-    }
     return tmNums;
   }
 
-  private void readTmNumbers() {
-    List<String> ftLines = getLines("FT   TRANSMEM");
-    tmNums = new ArrayList<SequencePart>();
-    for (String ftLine : ftLines) {
-      String fromStr = ftLine.substring(15, 20).trim();
-      String toStr = ftLine.substring(21, 27).trim();
+  private ArrayList<SequencePart> parseDomainParts(List<String> lines, 
+      String type) {
+    ArrayList<SequencePart> ret = new ArrayList<SequencePart>();
+    for (String line : lines) {
+      String fromStr = line.substring(15, 20).trim();
+      String toStr = line.substring(21, 27).trim();
       if (fromStr.contains("?") || toStr.contains("?")) {
         continue;
       }
@@ -103,7 +102,48 @@ public class Protein {
       }
       int from = Integer.parseInt(fromStr);
       int to = Integer.parseInt(toStr);
-      tmNums.add(new SequencePart(from, to));
+      ret.add(new SequencePart(from, to, type));
+    }
+    return ret;
+  }
+  
+  private void readDomains() {
+    if (tmNums == null || allDomains == null) {
+      tmNums = new ArrayList<SequencePart>();
+      allDomains = new ArrayList<SequencePart>();
+    } else {
+      tmNums.clear();
+      allDomains.clear();
+    }
+    readTmNumbers();
+    readInOutDomains();
+  }
+  
+  private void readTmNumbers() {
+    List<String> ftLines = getLines("FT   TRANSMEM" , "");
+    tmNums = parseDomainParts(ftLines, "TM");
+    allDomains.addAll(tmNums);
+  }
+  
+  private void readInOutDomains() {
+    List<String> innerDomainLines = getLines("FT   TOPO_DOM", "Cytoplasmic");
+    List<SequencePart> inDomains = parseDomainParts(innerDomainLines, "IN");
+    List<String> outerDomainLines = getLines("FT   TOPO_DOM", "Extracellular");
+    List<SequencePart> outDomains = parseDomainParts(outerDomainLines, "OUT");
+    allDomains.addAll(inDomains);
+    allDomains.addAll(outDomains);
+    int firstIn = Integer.MAX_VALUE;
+    int firstOut = Integer.MAX_VALUE;
+    if (!inDomains.isEmpty()) {
+      firstIn = inDomains.get(0).getFrom();
+    }
+    if (!outDomains.isEmpty()) {
+      firstOut = outDomains.get(0).getFrom();
+    }
+    if (firstIn < firstOut) {
+      setBeginsInside(true);
+    } else if (firstOut < Integer.MAX_VALUE) {
+      setBeginsInside(false);
     }
   }
 
@@ -124,10 +164,10 @@ public class Protein {
         if (diff > MINLENGTH) {
           if (diff > MAXLENGTH) {
             return new SequencePart(tmNums.get(i).getFrom(), tmNums.get(i)
-                .getTo() + MAXLENGTH);
+                .getTo() + MAXLENGTH, "TM");
           } else {
             return new SequencePart(tmNums.get(i).getFrom(), getSequence()
-                .length());
+                .length(), "TM");
           }
         }
       } else {
@@ -135,10 +175,10 @@ public class Protein {
         if (diff > MINLENGTH) {
           if (diff > MAXLENGTH) {
             return new SequencePart(tmNums.get(i).getFrom(), tmNums.get(i)
-                .getTo() + MAXLENGTH);
+                .getTo() + MAXLENGTH, "TM");
           } else {
             return new SequencePart(tmNums.get(i).getFrom(), tmNums.get(i + 1)
-                .getFrom() - 1);
+                .getFrom() - 1, "TM");
           }
         }
       }
@@ -147,9 +187,9 @@ public class Protein {
         if (tmNums.get(0).getFrom() > MINLENGTH) {
           if (tmNums.get(0).getFrom() > MAXLENGTH) {
             return new SequencePart(tmNums.get(0).getFrom() - MAXLENGTH,
-                tmNums.get(0).getTo());
+                tmNums.get(0).getTo(), "TM");
           } else {
-            return new SequencePart(1, tmNums.get(i).getTo());
+            return new SequencePart(1, tmNums.get(i).getTo(), "TM");
           }
         }
       } else {
@@ -157,10 +197,10 @@ public class Protein {
         if (diff > MINLENGTH) {
           if (diff > MAXLENGTH) {
             return new SequencePart(tmNums.get(i).getFrom() - MAXLENGTH,
-                tmNums.get(i).getTo());
+                tmNums.get(i).getTo(), "TM");
           } else {
             return new SequencePart(tmNums.get(i - 1).getTo() + 1, tmNums
-                .get(i).getTo());
+                .get(i).getTo(), "TM");
           }
         }
       }
@@ -169,4 +209,11 @@ public class Protein {
     return null;
   }
 
+  public boolean hasTmOrientationInfo() {
+    if (tmNums.size() > 0 && allDomains.size() > tmNums.size()) {
+      return true;
+    }
+    return false;
+  }
+  
 }

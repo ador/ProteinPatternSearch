@@ -20,7 +20,7 @@ public class ProteinFilter {
   public boolean match(Protein protein) {
     for (Pair<String, String> entry : requiredPatterns) {
       boolean thisPatternMatches = false;
-      for (String line : protein.getLines(entry.getKey())) {
+      for (String line : protein.getLines(entry.getKey(), "")) {
         String value = entry.getValue().toString();
         if (line.contains(value)) {
           thisPatternMatches = true;          
