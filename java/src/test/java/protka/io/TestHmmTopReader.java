@@ -21,19 +21,30 @@ public class TestHmmTopReader {
       + "     seq  MSIIGATRLQ NDKSDTYSAG PCYAGGCSAF TPRGTCGKDW DLGEQTCASG    "
       + "50\n"
       + "     pred OOOOOOOOOO OOOOOOOOOO OOOOOOOOOO OOOOOOOOOO OOOOOOOOOO\n";
-  private final String outputFile2 = ">HP: 320 sp|Q6GZX3|002L_FRG3G "
+  private final String outputFile2 = ">HP: 320 sp|Q6GZX4|002L_FRG3G "
       + "Uncharacterized protein 002L OS=Frog virus 3 (isolate Goorha) "
       + "GN=FV3-002L PE=4 OUT   1  301  318 \n" + "The best model:\n\n"
+      + "     seq  LKQMFTIDEF GSISSELNSV YQAGFLGFLI GAIYGGVTQS RVAYMNFMEN   100\n" 
+      + "     pred iIIIIIiiii OOOOOOOOOO OOOOOOOOOO OOOOOOOOOO OOOOOOOOOO\n"
+      + "\n"
       + "     seq  MSIIGATRLQ NDKSDTYSAG PCYAGGCSAF TPRGTCGKDW DLGEQTCASG    "
       + "50\n"
-      + "     pred iIIIIIiiii OOOOOOOOOO OOOOOOOOOO OOOOOOOOOO OOOOOOOOOO\n";
-  private final String outputFile3 = ">HP: 320 sp|Q6GZX3|002L_FRG3G "
+      + "     pred OOOOoooooo oooooooooH HHHHHHHHHH HHHHHHHiii iiiiiiiiii \n";
+  private final String outputFile3 = ">HP: 320 sp|Q6GZX5|002L_FRG3G "
       + "Uncharacterized protein 002L OS=Frog virus 3 (isolate Goorha) "
-      + "GN=FV3-002L PE=4 OUT   1  301  318 \n" + "The best model:\n\n"
-      + "     seq  MSIIGATRLQ NDKSDTYSAG PCYAGGCSAF TPRGTCGKDW DLGEQTCASG    "
+      + "GN=FV3-002L PE=4 OUT   1  301  318 \n"
+      + "The best model:\n\n"
+      + "     seq  MSIIGATRLQ NDKSDTYSAG PCYAGGCSAF TPRGTCGKDW DLGEQTCASG    50"
       + "50\n"
-      + "     pred iOoooOoooo OOOOOOOOOO OOOOOOOOOO OOOOOOOOOO OOOOOOOOOO\n";
-  private final String outputFile4 = ">HP: 320 sp|Q6GZX3|002L_FRG3G "
+      + "     pred iOoooOoooo OOOOOOOOOO OOOOOOOOOO OOOOOOOOOO OOOOOOOOOO\n"
+      + "\n"
+      + "     seq  LKQMFTIDEF GSISSELNSV YQAGFLGFLI GAIYGGVTQS RVAYMNFMEN   100\n" 
+      + "     pred OOOOoooooo oooooooooH HHHHHHHHHH HHHHHHHiii iiiiiiiiii \n" 
+      + "\n"
+      + "     seq  LKQMFTIDEF GSISSELNSV YQAGFLGFLI GAIYGGVTQS RVAYMNFMEN   100\n" 
+      + "     pred OOOOoooooo oooooooooH HHHHHHHHHH HHHHHHHiii iiiiiiiiii \n" 
+      + "\n";
+  private final String outputFile4 = ">HP: 320 sp|Q6GZX6|002L_FRG3G "
       + "Uncharacterized protein 002L OS=Frog virus 3 (isolate Goorha) "
       + "GN=FV3-002L PE=4 OUT   1  301  318 \n" + "The best model:\n\n"
       + "     seq  MSIIGATRLQ NDKSDTYSAG PCYAGGCSAF TPRGTCGKDW DLGEQTCASG    "
@@ -69,9 +80,13 @@ public class TestHmmTopReader {
     hmmTopReader4.closeReader();
 
     assertFalse(hmmTopReaderAll.getNextProteinBeginsInside());
+    assertEquals("Q6GZX3", hmmTopReaderAll.getLastACNum());
     assertTrue(hmmTopReaderAll.getNextProteinBeginsInside());
+    assertEquals("Q6GZX4", hmmTopReaderAll.getLastACNum());
     assertTrue(hmmTopReaderAll.getNextProteinBeginsInside());
+    assertEquals("Q6GZX5", hmmTopReaderAll.getLastACNum());
     assertFalse(hmmTopReaderAll.getNextProteinBeginsInside());
+    assertEquals("Q6GZX6", hmmTopReaderAll.getLastACNum());
     hmmTopReaderAll.closeReader();
   }
 

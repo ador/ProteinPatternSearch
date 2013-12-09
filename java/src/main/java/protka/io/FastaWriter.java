@@ -21,6 +21,10 @@ public class FastaWriter {
     output.flush();
     output.close();
   }
+  
+  public void flush() throws IOException {
+    output.flush();
+  }
 
   public void writeFastaItem(FastaItem fastaItem) throws IOException {
     output.write(fastaItem.headerRow.getBytes(Charset.forName("UTF-8")));
@@ -41,12 +45,14 @@ public class FastaWriter {
     if (protein.getBeginsInside() == null)
       return;
     for (int i = 0; i < protein.getTmNumbers().size(); ++i) {
+
       SequencePart sequencePart = protein.getSeqForTmPart(i);
       if (sequencePart != null) {
         int from = sequencePart.getFrom();
         int to = sequencePart.getTo();
-        String line = ">sp|" + protein.acNum + "|" + i + "|" + from
-            + "|" + to + "\n";
+        // +1 because in the output we index from 1 again
+        String line = ">sp|" + protein.getAcNum() + "|" + i + "|" + (from + 1)
+            + "|" + (to + 1) + "\n";
         output.write(line.getBytes(Charset.forName("UTF-8")));
         line = protein.getSequencePart(from, to) + "\n";
         output.write(line.getBytes(Charset.forName("UTF-8")));

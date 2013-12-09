@@ -54,7 +54,7 @@ public class FastaWriterTest {
       fastaWriter.writeFastaItem(fastaItem);
       fastaWriter.closeOS();
       String expected = ">sp|Q23456|something\nAAAA\nBBBB\nCCCC\n";
-      assertTrue(os.toString().equals(expected));
+      assertEquals(expected, os.toString());
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -79,7 +79,7 @@ public class FastaWriterTest {
       fastaWriter.closeOS();
       String expected = ">sp|Q23456|something1\nAAAA\nBBBB\nCCCC\n"
           + ">sp|QBCDEF|something2\nDDDD\nEEEE\nFFFF\n";
-      assertTrue(os.toString().equals(expected));
+      assertEquals(expected, os.toString());
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -94,7 +94,7 @@ public class FastaWriterTest {
       String expected = ">sp|Q6GZX4|1|103|175\n";
       expected += "YQGIQTCKIPGKVLSDLDAKIKAYNLTVEGVEGFVRYSRVTKQHVAAFLKELRHSKQYEN"
           + "VNLIHYILTDKRV\n";
-      assertTrue(expected.equals(os.toString()));
+      assertEquals(expected, os.toString());
       
       os = new ByteArrayOutputStream();
       fastaWriter = new FastaWriter(os);
@@ -106,7 +106,7 @@ public class FastaWriterTest {
           + ">sp|Q6GZX4|1|33|105\n"
           + "LLDYKEWSPPRVQVECPKAPVEWNNPPSEKGLIVGHFSGIKYKGEKAQASEVDVNKMCCWVSKFKD"
           + "AMRRYQG\n";
-      assertTrue(expected.equals(os.toString()));
+      assertEquals(expected, os.toString());
       fastaWriter.closeOS();
     } catch (IOException e) {
       e.printStackTrace();

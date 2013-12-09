@@ -75,7 +75,7 @@ public class FilteringDat {
           }
 
           if (counter % 10000 == 0) {
-            System.out.println("Read: " + counter + " protein.");
+            System.out.println("Read: " + counter + " proteins.");
           }
           ++counter;
         }

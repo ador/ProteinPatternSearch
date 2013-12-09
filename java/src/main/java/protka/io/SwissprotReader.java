@@ -24,7 +24,7 @@ public class SwissprotReader {
     input = is;
     reader = new BufferedReader(new InputStreamReader(input));
   }
-
+  
   public Protein getNextProtein() throws IOException {
     String line = reader.readLine();
     while (null != line) {
@@ -39,7 +39,7 @@ public class SwissprotReader {
     }
     return null;
   }
-
+  
   public void closeReader() throws IOException{
     reader.close();
   }

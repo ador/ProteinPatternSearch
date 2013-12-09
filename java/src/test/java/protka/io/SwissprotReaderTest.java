@@ -84,8 +84,8 @@ public class SwissprotReaderTest {
       Protein p1 = proteinList.get(0);
       Protein p2 = proteinList.get(1);
 
-      assertEquals("Q6GZX4", p1.acNum);
-      assertEquals("Q197E7", p2.acNum);
+      assertEquals("Q6GZX4", p1.getAcNum());
+      assertEquals("Q197E7", p2.getAcNum());
     } catch (IOException e) {
       e.printStackTrace();
     }

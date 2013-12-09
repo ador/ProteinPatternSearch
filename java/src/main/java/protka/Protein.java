@@ -7,11 +7,16 @@ public class Protein {
 
   private List<String> lines = new ArrayList<String>();
   private String sequence = "";
-  public String acNum;
+  private String acNum;
+
   private List<SequencePart> tmNums;
   private static int MINLENGTH;
   private static int MAXLENGTH;
   private List<SequencePart> allDomains;
+
+  public String getAcNum() {
+    return acNum;
+  }
 
   public static void setMinLength(int length) {
     MINLENGTH = length;
@@ -37,6 +42,7 @@ public class Protein {
 
   public void setLines(List<String> data) {
     lines.clear();
+    sequence = "";
     boolean seqReading = false;
     for (String l : data) {
       if (seqReading && !l.startsWith("//")) {
@@ -100,8 +106,9 @@ public class Protein {
       if (toStr.startsWith("<") || toStr.startsWith(">")) {
         toStr = toStr.substring(1);
       }
-      int from = Integer.parseInt(fromStr);
-      int to = Integer.parseInt(toStr);
+      // -1  because the data file indexes letters in strings starting with 1
+      int from = Integer.parseInt(fromStr) - 1; 
+      int to = Integer.parseInt(toStr) - 1;
       ret.add(new SequencePart(from, to, type));
     }
     return ret;
@@ -145,68 +152,72 @@ public class Protein {
     } else if (firstOut < Integer.MAX_VALUE) {
       setBeginsInside(false);
     }
+    
   }
 
+  // indexing goes from 0 ! returns inclusive
   public String getSequencePart(int from, int to) {
     String sequence = getSequence();
-    if (to <= sequence.length() && from > 0)
-      return getSequence().substring(from - 1, to);
-    else
-      return null;
+    if (to < sequence.length() && from >= 0 && from <= to) {
+      String ret = sequence.substring(from, to + 1);
+      return ret;
+    }
+    return null;
   }
 
-  public SequencePart getSeqForTmPart(int i) {
-    getTmNumbers();
-    if ((!beginsInside && i % 2 == 1 || beginsInside && i % 2 == 0)) {
-      // check if beginning is far away enough from TM part
-      if (i == tmNums.size() - 1) {
-        int diff = getSequence().length() - tmNums.get(i).getTo();
-        if (diff > MINLENGTH) {
-          if (diff > MAXLENGTH) {
-            return new SequencePart(tmNums.get(i).getFrom(), tmNums.get(i)
-                .getTo() + MAXLENGTH, "TM");
-          } else {
-            return new SequencePart(tmNums.get(i).getFrom(), getSequence()
-                .length(), "TM");
-          }
-        }
-      } else {
-        int diff = tmNums.get(i + 1).getFrom() - 1 - tmNums.get(i).getTo();
-        if (diff > MINLENGTH) {
-          if (diff > MAXLENGTH) {
-            return new SequencePart(tmNums.get(i).getFrom(), tmNums.get(i)
-                .getTo() + MAXLENGTH, "TM");
-          } else {
-            return new SequencePart(tmNums.get(i).getFrom(), tmNums.get(i + 1)
-                .getFrom() - 1, "TM");
-          }
-        }
-      }
+  private SequencePart getForwardSection(int i) {
+    int tmBeginning = tmNums.get(i).getFrom();
+    int tmEnding = tmNums.get(i).getTo();
+    // looking forwards from tm part
+    int externalBeginning = tmEnding + 1;
+    int externalEnding;
+    if (i == tmNums.size() - 1) { // the last part.. checking against the end of the whole sequence      
+      externalEnding = getSequence().length();
     } else {
-      if (i == 0) {
-        if (tmNums.get(0).getFrom() > MINLENGTH) {
-          if (tmNums.get(0).getFrom() > MAXLENGTH) {
-            return new SequencePart(tmNums.get(0).getFrom() - MAXLENGTH,
-                tmNums.get(0).getTo(), "TM");
-          } else {
-            return new SequencePart(1, tmNums.get(i).getTo(), "TM");
-          }
-        }
+      externalEnding = tmNums.get(i + 1).getFrom() - 1;
+    }
+    int diff = externalEnding - externalBeginning;
+    if (diff >= MINLENGTH - 1) {
+      if (diff >= MAXLENGTH - 1) {
+        return new SequencePart(tmBeginning, tmEnding + MAXLENGTH, "TM");
       } else {
-        int diff = tmNums.get(i).getFrom() - 1 - tmNums.get(i - 1).getTo();
-        if (diff > MINLENGTH) {
-          if (diff > MAXLENGTH) {
-            return new SequencePart(tmNums.get(i).getFrom() - MAXLENGTH,
-                tmNums.get(i).getTo(), "TM");
-          } else {
-            return new SequencePart(tmNums.get(i - 1).getTo() + 1, tmNums
-                .get(i).getTo(), "TM");
-          }
-        }
+        return new SequencePart(tmBeginning, externalEnding, "TM");
       }
     }
-
     return null;
+  }
+  
+  private SequencePart getBackwardSection(int i) {
+    int tmBeginning = tmNums.get(i).getFrom();
+    int tmEnding = tmNums.get(i).getTo();
+    // looking backwards from tm part
+    int externalBeginning;
+    int externalEnding = tmBeginning - 1;
+    if (i == 0) {
+      // potentially beginning at the very beginning of the whole seq.
+      externalBeginning = 0; 
+    } else {
+      externalBeginning = tmNums.get(i - 1).getTo() + 1;
+    }
+    int diff = externalEnding - externalBeginning;
+    if (diff >= MINLENGTH - 1) {
+      if (diff >= MAXLENGTH - 1) {
+        return new SequencePart(tmBeginning - MAXLENGTH, tmEnding, "TM");
+      } else {
+        return new SequencePart(externalBeginning, tmEnding, "TM");
+      }
+    }
+    return null;
+  }
+  
+  public SequencePart getSeqForTmPart(int i) {
+    getTmNumbers();
+    
+    if ((!beginsInside && i % 2 == 1 || beginsInside && i % 2 == 0)) {
+      return getForwardSection(i);
+    } else { 
+      return getBackwardSection(i);
+    }
   }
 
   public boolean hasTmOrientationInfo() {

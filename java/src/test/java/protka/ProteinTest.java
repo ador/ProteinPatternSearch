@@ -13,7 +13,8 @@ public class ProteinTest {
   private Protein protein2 = new Protein();
   private Protein protein3 = new Protein();
   private Protein protein4 = new Protein();
-
+  private Protein protein5 = new Protein();
+  
   @Before
   public void setUp() {
     List<String> lines1 = new ArrayList<String>();
@@ -94,17 +95,44 @@ public class ProteinTest {
     lines4.add("     PELFKAHDEK TSEHVSLDTI K");
     lines4.add("//");
 
+    List<String> lines5 = new ArrayList<String>();
+    lines5.add("ID   CXG1_BOVIN              Reviewed;         396 AA.\n"); 
+    lines5.add("AC   Q2HJ66;\n"); 
+    lines5.add("FT   CHAIN         1    396       Gap junction gamma-1 protein.\n"); 
+    lines5.add("FT                                /FTId=PRO_0000244877.\n"); 
+    lines5.add("FT   TOPO_DOM      1     22       Cytoplasmic (Potential).\n"); 
+    lines5.add("FT   TRANSMEM     23     45       Helical; (Potential).\n"); 
+    lines5.add("FT   TOPO_DOM     46     75       Extracellular (Potential).\n"); 
+    lines5.add("FT   TRANSMEM     76     95       Helical; (Potential).\n"); 
+    lines5.add("FT   TOPO_DOM     96    175       Cytoplasmic (Potential).\n"); 
+    lines5.add("FT   TRANSMEM    176    198       Helical; (Potential).\n");
+    lines5.add("FT   TOPO_DOM    199    228       Extracellular (Potential).\n"); 
+    lines5.add("FT   TRANSMEM    229    248       Helical; (Potential).\n");
+    lines5.add("FT   TOPO_DOM    249    396       Cytoplasmic (Potential).\n");
+    lines5.add("SQ   SEQUENCE   396 AA;  sdf\n"); 
+    lines5.add("MSWSFLTRLLEEIHNHSTFVGKIWLTVLIVFRIVLTAVGGESIYYDEQSKFVCNTEQPGC\n"); 
+    lines5.add("ENVCYDAFAPLSHVRFWVFQIILVATPSVMYLGYAIHKIAKMEHGDADKKAARSKPYAMR\n");
+    lines5.add("WKQHRALEETEEDHEEDPMMYPEMELESEKENKDQNQSKPKHDGRRRIREDGLMKIYVLQ\n"); 
+    lines5.add("LLARTVFEVGFLVGQYFLYGFQVHPFYVCSRLPCPHKIDCFISRPTEKTIFLLIMYGVTG\n"); 
+    lines5.add("LCLLLNIWEMLHLGFGTIRDSLNSKRRELEDPGAYNYPFTWNTPSAPPGYNIAVKPDQIQ\n"); 
+    lines5.add("YTELSNAKIAYKQNKANIAQEQQYGSHEDNLPPDLETLQREIRMAQERLDLAIQAYNHQN\n"); 
+    lines5.add("NPHGSREKKAKVGSKAGSNKSSASSKSGDGKTSVWI");
+ 
+    
     protein1.setLines(lines1);
     protein2.setLines(lines2);
     protein3.setLines(lines3);
     protein4.setLines(lines4);
+    protein5.setLines(lines5);
+    
     Protein.setMaxLength(70);
     Protein.setMinLength(40);
   }
 
   @Test
   public void testAcNum() {
-    assertTrue(protein1.acNum.equals("Q6GZX4"));
+    assertTrue(protein1.getAcNum().equals("Q6GZX4"));
+    assertTrue(protein5.getAcNum().equals("Q2HJ66"));
   }
 
   @Test
@@ -112,8 +140,9 @@ public class ProteinTest {
     List<SequencePart> tmNumbers = protein1.getTmNumbers();
     assertNotNull(tmNumbers);
     assertEquals(1, tmNumbers.size());
-    assertEquals(13, tmNumbers.get(0).getFrom());
-    assertEquals(31, tmNumbers.get(0).getTo());
+    // -1 because we index from 0, not from 1 as the data file
+    assertEquals(12, tmNumbers.get(0).getFrom());
+    assertEquals(30, tmNumbers.get(0).getTo());
 
     tmNumbers = protein2.getTmNumbers();
     assertNotNull(tmNumbers);
@@ -125,17 +154,17 @@ public class ProteinTest {
     List<SequencePart> tmNumbers = protein2.getTmNumbers();
     assertNotNull(tmNumbers);
     assertEquals(4, tmNumbers.size());
-    assertEquals(12, tmNumbers.get(0).getFrom());
-    assertEquals(21, tmNumbers.get(0).getTo());
-    assertEquals(123, tmNumbers.get(3).getFrom());
-    assertEquals(123, tmNumbers.get(3).getTo());
+    assertEquals(11, tmNumbers.get(0).getFrom());
+    assertEquals(20, tmNumbers.get(0).getTo());
+    assertEquals(122, tmNumbers.get(3).getFrom());
+    assertEquals(122, tmNumbers.get(3).getTo());
   }
 
   @Test
   public void testGetSequencePart() {
-    assertEquals("YKGEKA", protein1.getSequencePart(74, 79));
-    assertEquals("L", protein1.getSequencePart(256, 256));
-    assertNull(protein1.getSequencePart(256, 257));
+    assertEquals("YKGEKA", protein1.getSequencePart(73, 78));
+    assertEquals("L", protein1.getSequencePart(255, 255));
+    assertNull(protein1.getSequencePart(255, 257));
   }
 
   @Test
@@ -145,23 +174,23 @@ public class ProteinTest {
     assertNull(seqPart);
     protein1.setBeginsInside(true);
     seqPart = protein1.getSeqForTmPart(0);
-    assertEquals(13, seqPart.getFrom());
-    assertEquals(101, seqPart.getTo());
+    assertEquals(12, seqPart.getFrom());
+    assertEquals(100, seqPart.getTo());
 
     protein3.setBeginsInside(true);
     seqPart = protein3.getSeqForTmPart(0);
     assertNull(seqPart);
     protein3.setBeginsInside(false);
     seqPart = protein3.getSeqForTmPart(0);
-    assertEquals(170, seqPart.getFrom());
-    assertEquals(250, seqPart.getTo());
+    assertEquals(169, seqPart.getFrom());
+    assertEquals(249, seqPart.getTo());
 
     protein2.setBeginsInside(false);
     seqPart = protein2.getSeqForTmPart(0);
     assertNull(seqPart);
     seqPart = protein2.getSeqForTmPart(1);
-    assertEquals(23, seqPart.getFrom());
-    assertEquals(95, seqPart.getTo());
+    assertEquals(22, seqPart.getFrom());
+    assertEquals(94, seqPart.getTo());
 
     protein2.setBeginsInside(true);
     seqPart = protein2.getSeqForTmPart(0);
@@ -175,14 +204,14 @@ public class ProteinTest {
     protein4.setBeginsInside(false);
     List<SequencePart> tmNumbers = protein4.getTmNumbers();
     assertEquals(3, tmNumbers.size());
-    assertEquals(67, protein4.getTmNumbers().get(0).getFrom());
-    assertEquals(87, protein4.getTmNumbers().get(0).getTo());
-    assertEquals(203, protein4.getTmNumbers().get(2).getTo());
+    assertEquals(66, protein4.getTmNumbers().get(0).getFrom());
+    assertEquals(86, protein4.getTmNumbers().get(0).getTo());
+    assertEquals(202, protein4.getTmNumbers().get(2).getTo());
     SequencePart seqPart = protein4.getSeqForTmPart(0);
-    assertEquals(1, seqPart.getFrom());
-    assertEquals(87, seqPart.getTo());
+    assertEquals(0, seqPart.getFrom());
+    assertEquals(86, seqPart.getTo());
   }
-  
+
   @Test
   public void testTmOriantation() {
     assertFalse(protein1.hasTmOrientationInfo());
@@ -192,4 +221,42 @@ public class ProteinTest {
     assertTrue(protein4.hasTmOrientationInfo());
     assertFalse(protein4.getBeginsInside());
   }
+
+  @Test
+  public void testProtein5A() {
+    Protein.setMinLength(40);
+    assertTrue(protein5.getBeginsInside());
+    List<SequencePart> tmNumbers = protein5.getTmNumbers();
+    
+    assertEquals(4, tmNumbers.size());
+    for (int i = 1; i < 4; i++) {
+      assertNull(protein5.getSeqForTmPart(i));
+    }
+  }
+
+  @Test
+  public void testProtein5B() {
+    Protein.setMinLength(30); // corner case
+    
+    assertTrue(protein5.getBeginsInside());
+    List<SequencePart> tmNumbers = protein5.getTmNumbers();
+    
+    assertEquals(4, tmNumbers.size());
+    int from = tmNumbers.get(0).getFrom();
+    int to = tmNumbers.get(0).getTo();
+    
+    assertEquals(22, from);
+    assertEquals(44, to);
+    
+    String tmSeq = protein5.getSequencePart(from, to);
+    assertEquals("IWLTVLIVFRIVLTAVGGESIYY", tmSeq);
+
+    SequencePart seqPart0 = protein5.getSeqForTmPart(0);
+    assertEquals(22, seqPart0.getFrom());
+    assertEquals(74, seqPart0.getTo());
+    SequencePart seqPart1 = protein5.getSeqForTmPart(1);
+    assertEquals(45, seqPart1.getFrom());
+    assertEquals(94, seqPart1.getTo());
+  }
+
 }

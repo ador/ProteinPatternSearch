@@ -80,13 +80,13 @@ public class MainProteinFilter {
         counter = 1;
         while ((protein = swissprotReader.getNextProtein()) != null) {
           if (proteinFilter.match(protein)
-              && fastaMap.containsKey(protein.acNum)) {
+              && fastaMap.containsKey(protein.getAcNum())) {
             swissprotWriter.writeProtein(protein);
-            fastaWriter.writeFastaItem(fastaMap.get(protein.acNum));
+            fastaWriter.writeFastaItem(fastaMap.get(protein.getAcNum()));
             
             if (counter % 1000 == 0) {
               System.out
-                  .println("Write " + counter + " fastaItem and protein.");
+                  .println("Wrote " + counter + " fastaItems and proteins.");
             }
             ++counter;
           }
