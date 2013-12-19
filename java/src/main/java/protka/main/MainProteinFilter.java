@@ -17,15 +17,19 @@ import protka.io.SwissprotReader;
 import protka.io.SwissprotWriter;
 
 public class MainProteinFilter {
+  
+  
   private static final String[] requiredProps = { "inputDatFile",
       "outputFastaFile", "inputFastaFile", "outputDatFile" };
 
   public static void main(String args[]) {
     if (args.length != 1) {
-      System.out.println("Usage: MainOperation prop.properties");
+      System.out.println("Usage: MainProteinFilter settings.properties");
       return;
     }
 
+    int minSeqLen = 25;
+    
     PropertyHandler propHandler = new PropertyHandler(requiredProps);
 
     FileInputStream inDat;
@@ -45,6 +49,7 @@ public class MainProteinFilter {
         outDat = new FileOutputStream(
             properties.getProperty("outputDatFile"));
 
+        
         FastaReader fastaReader = new FastaReader(inFasta);
         Map<String, FastaItem> fastaMap = new HashMap<String, FastaItem>(600000);
 
@@ -54,12 +59,18 @@ public class MainProteinFilter {
           fastaMap.put(fastaItem.acNum, fastaItem);
           fastaItem = fastaReader.getNextFastaItem();
           if (counter % 10000 == 0) {
-            System.out.println("Read " + counter + " fastaItem.");
+            System.out.println("Read " + counter + " fasta items.");
           }
           ++counter;
         }
 
         ProteinFilter proteinFilter = new ProteinFilter();
+
+        // optional property
+        if (properties.containsKey("minSeqLength")) {
+          minSeqLen = Integer.parseInt(properties.getProperty("minSeqLength"));
+          proteinFilter.setMinSeqLen(minSeqLen);
+        }
 
         if (properties.containsKey("matchProteinPatterns")) {
           String[] patterns = properties.getProperty(
@@ -86,7 +97,7 @@ public class MainProteinFilter {
             
             if (counter % 1000 == 0) {
               System.out
-                  .println("Wrote " + counter + " fastaItems and proteins.");
+                  .println("Wrote " + counter + " fasta items and proteins.");
             }
             ++counter;
           }

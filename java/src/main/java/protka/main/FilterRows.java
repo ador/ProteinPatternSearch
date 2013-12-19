@@ -14,7 +14,7 @@ public class FilterRows {
 
   public static void main(String args[]) throws IOException {
     if (args.length != 1) {
-      System.out.println("Usage: FilterRows prop.rowfilterprop");
+      System.out.println("Usage: FilterRows settings.properties");
       return;
     }
 

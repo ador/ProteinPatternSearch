@@ -97,19 +97,25 @@ public class ProteinTest {
 
     List<String> lines5 = new ArrayList<String>();
     lines5.add("ID   CXG1_BOVIN              Reviewed;         396 AA.\n"); 
-    lines5.add("AC   Q2HJ66;\n"); 
+    lines5.add("AC   Q2HJ66;\n");
+    lines5.add("OS   Pan troglodytes (Chimpanzee).\n"); 
+    lines5.add("OC   Eukaryota; Metazoa; Chordata; Craniata; Vertebrata; Euteleostomi;\n"); 
+    lines5.add("OC   Mammalia; Eutheria; Euarchontoglires; Primates; Haplorrhini;\n");
+    lines5.add("OC   Catarrhini; Hominidae; Pan.");
+
     lines5.add("FT   CHAIN         1    396       Gap junction gamma-1 protein.\n"); 
-    lines5.add("FT                                /FTId=PRO_0000244877.\n"); 
+    lines5.add("FT                                /FTId=PRO_0000244877.\n");
     lines5.add("FT   TOPO_DOM      1     22       Cytoplasmic (Potential).\n"); 
-    lines5.add("FT   TRANSMEM     23     45       Helical; (Potential).\n"); 
+    lines5.add("FT   TRANSMEM     23     45       Helical; (Potential).\n");
     lines5.add("FT   TOPO_DOM     46     75       Extracellular (Potential).\n"); 
-    lines5.add("FT   TRANSMEM     76     95       Helical; (Potential).\n"); 
+    lines5.add("FT   TRANSMEM     76     95       Helical; (Potential).\n");
     lines5.add("FT   TOPO_DOM     96    175       Cytoplasmic (Potential).\n"); 
     lines5.add("FT   TRANSMEM    176    198       Helical; (Potential).\n");
     lines5.add("FT   TOPO_DOM    199    228       Extracellular (Potential).\n"); 
     lines5.add("FT   TRANSMEM    229    248       Helical; (Potential).\n");
-    lines5.add("FT   TOPO_DOM    249    396       Cytoplasmic (Potential).\n");
-    lines5.add("SQ   SEQUENCE   396 AA;  sdf\n"); 
+    lines5.add("FT   TOPO_DOM    249    300       Cytoplasmic (Potential).\n");
+    lines5.add("FT   DOMAIN      301    396       Ig-like C1-type.\n");
+    lines5.add("SQ   SEQUENCE   396 AA;  sdf\n");
     lines5.add("MSWSFLTRLLEEIHNHSTFVGKIWLTVLIVFRIVLTAVGGESIYYDEQSKFVCNTEQPGC\n"); 
     lines5.add("ENVCYDAFAPLSHVRFWVFQIILVATPSVMYLGYAIHKIAKMEHGDADKKAARSKPYAMR\n");
     lines5.add("WKQHRALEETEEDHEEDPMMYPEMELESEKENKDQNQSKPKHDGRRRIREDGLMKIYVLQ\n"); 
@@ -232,6 +238,22 @@ public class ProteinTest {
     for (int i = 1; i < 4; i++) {
       assertNull(protein5.getSeqForTmPart(i));
     }
+    List<SequencePart> domains = protein5.getFuncDomains();
+    assertEquals(1, domains.size());
+    
+    SequencePart domain0 = protein5.getNearestDomain(12, 50);
+    assertNull(domain0);
+
+    SequencePart domain1 = protein5.getNearestDomain(300, 0);
+    assertNull(domain1);
+
+    SequencePart domain2 = protein5.getNearestDomain(300, 1);
+    assertNotNull(domain2);
+
+    SequencePart domain3 = protein5.getNearestDomain(251, 50);
+    assertNotNull(domain3);
+    assertEquals(domain2.getFrom(), domain3.getFrom());
+    assertEquals(domain2.getTo(), domain3.getTo());
   }
 
   @Test
@@ -257,6 +279,22 @@ public class ProteinTest {
     SequencePart seqPart1 = protein5.getSeqForTmPart(1);
     assertEquals(45, seqPart1.getFrom());
     assertEquals(94, seqPart1.getTo());
+  }
+  
+  @Test
+  public void testReadTaxonomy() {
+    
+    List<String> taxo1 = protein1.getTaxonomyList();
+    assertEquals(0, taxo1.size());
+    
+    List<String> taxo5 = protein5.getTaxonomyList();
+    assertEquals("Eukaryota", taxo5.get(0));
+    assertEquals("Hominidae", taxo5.get(12));
+    assertEquals(14, taxo5.size()); 
+    
+    String species = protein5.getSpecies();
+    assertEquals("Pan troglodytes (Chimpanzee).", species);
+    
   }
 
 }

@@ -9,6 +9,7 @@ import protka.Protein;
 
 public class ProteinFilter {
 
+  private int minSeqLen = 25;
   
   private List<Pair<String, String> > requiredPatterns = 
       new ArrayList<Pair<String, String> >();
@@ -18,6 +19,12 @@ public class ProteinFilter {
   }
 
   public boolean match(Protein protein) {
+    // check sequence length:
+    int seqLen = protein.getSequence().length();
+    if (seqLen < minSeqLen) {
+      return false;
+    }
+    // check patterns
     for (Pair<String, String> entry : requiredPatterns) {
       boolean thisPatternMatches = false;
       for (String line : protein.getLines(entry.getKey(), "")) {
@@ -31,5 +38,9 @@ public class ProteinFilter {
       }
     }
     return true;
+  }
+
+  public void setMinSeqLen(int minSeqLen) {
+    this.minSeqLen = minSeqLen;
   }
 }

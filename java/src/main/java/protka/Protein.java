@@ -10,9 +10,12 @@ public class Protein {
   private String acNum;
 
   private List<SequencePart> tmNums;
+  private List<SequencePart> inOutDomains;
+  private List<SequencePart> funcDomains;
   private static int MINLENGTH;
   private static int MAXLENGTH;
   private List<SequencePart> allDomains;
+  private List<String> taxonomy;
 
   public String getAcNum() {
     return acNum;
@@ -44,19 +47,22 @@ public class Protein {
     lines.clear();
     sequence = "";
     boolean seqReading = false;
-    for (String l : data) {
-      if (seqReading && !l.startsWith("//")) {
-        String seqPart = l.trim();
-        String s2 = seqPart.replaceAll(" ", "");
-        sequence = sequence + s2;
-      }
-      lines.add(l);
-      if (l.startsWith("SQ")) {
-        seqReading = true;
-      }
-      if (l.startsWith("AC")) {
-        String id = l.split("   ")[1];
-        acNum = id.split(";")[0];
+    for (String dataPart: data) {
+      String[] linesRead = dataPart.split("\\r?\\n");
+      for (String l : linesRead){
+        if (seqReading && !l.startsWith("//")) {
+          String seqPart = l.trim();
+          String s2 = seqPart.replaceAll(" ", "");
+          sequence = sequence + s2;
+        }
+        lines.add(dataPart);
+        if (l.startsWith("SQ")) {
+          seqReading = true;
+        }
+        if (l.startsWith("AC")) {
+          String id = dataPart.split("   ")[1];
+          acNum = id.split(";")[0];
+        }
       }
     }
     readDomains();
@@ -91,6 +97,10 @@ public class Protein {
     return tmNums;
   }
 
+  public List<SequencePart> getFuncDomains() {
+    return funcDomains;
+  }
+
   private ArrayList<SequencePart> parseDomainParts(List<String> lines, 
       String type) {
     ArrayList<SequencePart> ret = new ArrayList<SequencePart>();
@@ -117,13 +127,18 @@ public class Protein {
   private void readDomains() {
     if (tmNums == null || allDomains == null) {
       tmNums = new ArrayList<SequencePart>();
+      inOutDomains = new ArrayList<SequencePart>();
+      funcDomains = new ArrayList<SequencePart>();
       allDomains = new ArrayList<SequencePart>();
     } else {
       tmNums.clear();
+      inOutDomains.clear();
+      funcDomains.clear();
       allDomains.clear();
     }
     readTmNumbers();
     readInOutDomains();
+    readFuncDomains();
   }
   
   private void readTmNumbers() {
@@ -131,12 +146,23 @@ public class Protein {
     tmNums = parseDomainParts(ftLines, "TM");
     allDomains.addAll(tmNums);
   }
-  
+
+  private void readFuncDomains() {
+    List<String> ftLines = getLines("FT   DOMAIN" , "");
+    if (ftLines.isEmpty()) { 
+      return;
+    }
+    funcDomains = parseDomainParts(ftLines, "DOMAIN");
+    allDomains.addAll(funcDomains);
+  }
+
   private void readInOutDomains() {
     List<String> innerDomainLines = getLines("FT   TOPO_DOM", "Cytoplasmic");
     List<SequencePart> inDomains = parseDomainParts(innerDomainLines, "IN");
     List<String> outerDomainLines = getLines("FT   TOPO_DOM", "Extracellular");
     List<SequencePart> outDomains = parseDomainParts(outerDomainLines, "OUT");
+    inOutDomains.addAll(inDomains);   
+    inOutDomains.addAll(outDomains);
     allDomains.addAll(inDomains);
     allDomains.addAll(outDomains);
     int firstIn = Integer.MAX_VALUE;
@@ -221,10 +247,62 @@ public class Protein {
   }
 
   public boolean hasTmOrientationInfo() {
-    if (tmNums.size() > 0 && allDomains.size() > tmNums.size()) {
+    if (!inOutDomains.isEmpty()) {
       return true;
     }
     return false;
+  }
+
+  public SequencePart getNearestDomain(int posInSeq, int maxDist) {
+    if (funcDomains.isEmpty()) {
+      return null;
+    }
+    int minDist = maxDist;
+    SequencePart ret = null;
+    for (SequencePart sqp: funcDomains) {
+      if (Math.abs(sqp.getFrom() - posInSeq) < minDist) {
+        minDist = Math.abs(sqp.getFrom() - posInSeq);
+        ret = sqp;
+      }
+      if (Math.abs(sqp.getTo() - posInSeq) < minDist) {
+        minDist = Math.abs(sqp.getTo() - posInSeq);
+        ret = sqp;
+      }
+    }
+    if (minDist <= maxDist) {
+      return ret;
+    }
+    return null;
+  }
+
+  public void readTaxonomy() {
+    List<String> ocLines = getLines("OC", "");
+    taxonomy = new ArrayList<String>();
+    for (String line: ocLines) {
+      String lineContent = line.substring(3);
+      String[] sArray = lineContent.split(";");
+      for (String s: sArray) {
+        if (s.trim().length() > 0)
+          taxonomy.add(s.trim());
+      }
+    }
+  }
+  
+  public List<String> getTaxonomyList() {
+    if (taxonomy == null) {
+      readTaxonomy();
+    }
+    return taxonomy;
+  }
+
+  public String getSpecies() {
+    List<String> osLines = getLines("OS", "");
+    String species = "";
+    for (String line: osLines) {
+      String lineContent = line.substring(3).trim();
+      species += lineContent;
+    }
+    return species;
   }
   
 }

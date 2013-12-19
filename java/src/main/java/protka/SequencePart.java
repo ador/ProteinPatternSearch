@@ -3,7 +3,7 @@ package protka;
 public class SequencePart {
   private final int from;
   private final int to;
-  private String type;
+  private String type;  // TM, IN, OUT, DOMAIN 
 
   public SequencePart(int from, int to, String type) {
     this.from = from;

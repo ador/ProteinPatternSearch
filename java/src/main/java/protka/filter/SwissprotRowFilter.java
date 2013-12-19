@@ -55,7 +55,7 @@ public class SwissprotRowFilter {
       }
       countIn++;
       if (countIn % 100000 == 0) {
-        System.out.println("Proteins processed: " + countIn + "   out : "
+        System.out.println("Lines processed: " + countIn + "   written : "
             + countOut);
       }
       line = reader.readLine();
