@@ -2,7 +2,7 @@ apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'application'
 
-mainClassName = "protka.main.MainProteinFilter"
+mainClassName = "protka.main.MetaMain"
 
 test {
   testLogging.showStandardStreams = true
