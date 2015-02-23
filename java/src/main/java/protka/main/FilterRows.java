@@ -1,5 +1,6 @@
 package protka.main;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -29,6 +30,8 @@ public class FilterRows {
 
       is = new FileInputStream(
           properties.getProperty("inputDatFile"));
+      File targetFile = new File(properties.getProperty("outputDatFile")); 
+      targetFile.mkdirs();
       os = new FileOutputStream(
           properties.getProperty("outputDatFile"));
 
