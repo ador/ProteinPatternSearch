@@ -1,4 +1,8 @@
-/build/
+/java/build/
+/java/.gradle/
+/java/.settings/
+/java/.classpath
+/java/.project
 *.class
 
 # Package Files #
