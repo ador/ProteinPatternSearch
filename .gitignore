@@ -3,6 +3,7 @@
 /java/.settings/
 /java/.classpath
 /java/.project
+/java/.gitignore
 *.class
 
 # Package Files #
