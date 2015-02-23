@@ -9,7 +9,7 @@ public class MetaMain {
   }
 
   public static void printHelp() {
-    System.out.println("Usage: protPS <taskname> <settings.properties file path>");
+    System.out.println("Usage: java -jar PPsearch.jar <taskname> <settings.properties file path>");
     System.out.println("\t Available tasks are:");
     for (Task task : Task.values()) {
       System.out.println(" " + task.toString());
