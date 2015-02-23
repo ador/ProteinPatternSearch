@@ -1,6 +1,7 @@
+apply plugin: 'application'
 apply plugin: 'java'
 apply plugin: 'eclipse'
-apply plugin: 'application'
+
 
 mainClassName = "protka.main.MetaMain"
 
@@ -21,7 +22,15 @@ dependencies {
 }
 
 task copyToLib(type: Copy) {
-    into "$buildDir/output/lib"
-    from configurations.runtime
+  into "$buildDir/output/lib"
+  from configurations.runtime
+}
+
+jar {
+  manifest {
+    attributes("Implementation-Title": "ProteinPatternSearch",
+      "Implementation-Version": 0.5,
+      "Main-Class": "protka.main.MetaMain")
+  }
 }
 
