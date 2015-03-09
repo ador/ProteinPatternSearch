@@ -1,9 +1,8 @@
 package protka.filter;
 
 import java.util.*;
-import org.apache.commons.lang3.tuple.*;
-//import org.apache.commons.lang3.tuple.Pair;
-//import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 
 import protka.Protein;
 

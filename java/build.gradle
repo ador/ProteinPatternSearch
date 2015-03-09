@@ -32,5 +32,15 @@ jar {
       "Implementation-Version": 0.5,
       "Main-Class": "protka.main.MetaMain")
   }
+  dependsOn configurations.runtime
+    from {
+        (configurations.runtime).collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    } {
+        exclude "META-INF/*.SF"
+        exclude "META-INF/*.DSA"
+        exclude "META-INF/*.RSA"
+    }
 }
 
