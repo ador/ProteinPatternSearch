@@ -9,7 +9,7 @@ public class Protein {
   private String sequence = "";
   private String acNum;
 
-  private List<SequencePart> tmNums;
+  private List<SequencePart> tmDomains;
   private List<SequencePart> inOutDomains;
   private List<SequencePart> funcDomains;
   private static int MINLENGTH;
@@ -94,7 +94,7 @@ public class Protein {
   }
 
   public List<SequencePart> getTmNumbers() {
-    return tmNums;
+    return tmDomains;
   }
 
   public List<SequencePart> getFuncDomains() {
@@ -125,26 +125,26 @@ public class Protein {
   }
   
   private void readDomains() {
-    if (tmNums == null || allDomains == null) {
-      tmNums = new ArrayList<SequencePart>();
+    if (tmDomains == null || allDomains == null) {
+      tmDomains = new ArrayList<SequencePart>();
       inOutDomains = new ArrayList<SequencePart>();
       funcDomains = new ArrayList<SequencePart>();
       allDomains = new ArrayList<SequencePart>();
     } else {
-      tmNums.clear();
+      tmDomains.clear();
       inOutDomains.clear();
       funcDomains.clear();
       allDomains.clear();
     }
-    readTmNumbers();
+    readTmDomains();
     readInOutDomains();
     readFuncDomains();
   }
   
-  private void readTmNumbers() {
+  private void readTmDomains() {
     List<String> ftLines = getLines("FT   TRANSMEM" , "");
-    tmNums = parseDomainParts(ftLines, "TM");
-    allDomains.addAll(tmNums);
+    tmDomains = parseDomainParts(ftLines, "TM");
+    allDomains.addAll(tmDomains);
   }
 
   private void readFuncDomains() {
@@ -192,15 +192,15 @@ public class Protein {
   }
 
   private SequencePart getForwardSection(int i) {
-    int tmBeginning = tmNums.get(i).getFrom();
-    int tmEnding = tmNums.get(i).getTo();
+    int tmBeginning = tmDomains.get(i).getFrom();
+    int tmEnding = tmDomains.get(i).getTo();
     // looking forwards from tm part
     int externalBeginning = tmEnding + 1;
     int externalEnding;
-    if (i == tmNums.size() - 1) { // the last part.. checking against the end of the whole sequence      
+    if (i == tmDomains.size() - 1) { // the last part.. checking against the end of the whole sequence      
       externalEnding = getSequence().length();
     } else {
-      externalEnding = tmNums.get(i + 1).getFrom() - 1;
+      externalEnding = tmDomains.get(i + 1).getFrom() - 1;
     }
     int diff = externalEnding - externalBeginning;
     if (diff >= MINLENGTH - 1) {
@@ -214,8 +214,8 @@ public class Protein {
   }
   
   private SequencePart getBackwardSection(int i) {
-    int tmBeginning = tmNums.get(i).getFrom();
-    int tmEnding = tmNums.get(i).getTo();
+    int tmBeginning = tmDomains.get(i).getFrom();
+    int tmEnding = tmDomains.get(i).getTo();
     // looking backwards from tm part
     int externalBeginning;
     int externalEnding = tmBeginning - 1;
@@ -223,7 +223,7 @@ public class Protein {
       // potentially beginning at the very beginning of the whole seq.
       externalBeginning = 0; 
     } else {
-      externalBeginning = tmNums.get(i - 1).getTo() + 1;
+      externalBeginning = tmDomains.get(i - 1).getTo() + 1;
     }
     int diff = externalEnding - externalBeginning;
     if (diff >= MINLENGTH - 1) {
