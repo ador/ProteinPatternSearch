@@ -93,7 +93,7 @@ public class Protein {
     return sequence;
   }
 
-  public List<SequencePart> getTmNumbers() {
+  public List<SequencePart> getTmDomains() {
     return tmDomains;
   }
 
@@ -237,7 +237,7 @@ public class Protein {
   }
   
   public SequencePart getSeqForTmPart(int i) {
-    getTmNumbers();
+    getTmDomains();
     
     if ((!beginsInside && i % 2 == 1 || beginsInside && i % 2 == 0)) {
       return getForwardSection(i);
