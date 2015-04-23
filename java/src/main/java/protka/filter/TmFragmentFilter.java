@@ -1,5 +1,12 @@
 package protka.filter;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import protka.Protein;
+import protka.SequencePart;
+
+
 public class TmFragmentFilter {
   private int minExtracellularLen;
   private int maxExtracellularLen;
@@ -20,4 +27,7 @@ public class TmFragmentFilter {
     return maxExtracellularLen;
   }
 
+  public List<SequencePart> getFragments(Protein p){
+    return new ArrayList<SequencePart>();
+  }
 }
