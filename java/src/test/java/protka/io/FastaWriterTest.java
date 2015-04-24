@@ -25,7 +25,7 @@ public class FastaWriterTest {
     lines.add("ID   001R_FRG3G              Reviewed;         256 AA.");
     lines.add("AC   Q6GZX4;");
     lines.add("FT   TRANSMEM    13    32       Helical; (Potential).");
-    lines.add("FT   TRANSMEM   103   105       Helical; (Potential).");
+    lines.add("FT   TRANSMEM   103   125       Helical; (Potential).");
     lines.add("SQ   SEQUENCE   256 AA;  29735 MW;  B4840739BF7D4121 CRC64;");
     lines.add("     MAFSAEDVLK EYDRRRRMEA LLLSLYYPND RKLLDYKEWS PPRVQVECPK "
         + "APVEWNNPPS");
@@ -39,8 +39,8 @@ public class FastaWriterTest {
     lines.add("//");
 
     protein.setLines(lines);
-    Protein.setMaxLength(70);
-    Protein.setMinLength(40);
+    Protein.setMaxFragmentLength(70);
+    Protein.setMinFragmentLength(40);
   }
 
   @Test
@@ -80,34 +80,6 @@ public class FastaWriterTest {
       String expected = ">sp|Q23456|something1\nAAAA\nBBBB\nCCCC\n"
           + ">sp|QBCDEF|something2\nDDDD\nEEEE\nFFFF\n";
       assertEquals(expected, os.toString());
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
-
-  @Test
-  public void testWriteProtSeqInPieces() {
-    try {
-      FastaWriter fastaWriter = new FastaWriter(os);
-      protein.setBeginsInside(false);
-      fastaWriter.writeProtSeqInPieces(protein);
-      String expected = ">sp|Q6GZX4|1|103|175\n";
-      expected += "YQGIQTCKIPGKVLSDLDAKIKAYNLTVEGVEGFVRYSRVTKQHVAAFLKELRHSKQYEN"
-          + "VNLIHYILTDKRV\n";
-      assertEquals(expected, os.toString());
-      
-      os = new ByteArrayOutputStream();
-      fastaWriter = new FastaWriter(os);
-      protein.setBeginsInside(true);
-      fastaWriter.writeProtSeqInPieces(protein);
-      expected = ">sp|Q6GZX4|0|13|102\n"
-          + "DRRRRMEALLLSLYYPNDRKLLDYKEWSPPRVQVECPKAPVEWNNPPSEKGLIVGHFSGIKYKGEK"
-          + "AQASEVDVNKMCCWVSKFKDAMRR\n"
-          + ">sp|Q6GZX4|1|33|105\n"
-          + "LLDYKEWSPPRVQVECPKAPVEWNNPPSEKGLIVGHFSGIKYKGEKAQASEVDVNKMCCWVSKFKD"
-          + "AMRRYQG\n";
-      assertEquals(expected, os.toString());
-      fastaWriter.closeOS();
     } catch (IOException e) {
       e.printStackTrace();
     }

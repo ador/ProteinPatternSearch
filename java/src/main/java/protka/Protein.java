@@ -12,8 +12,8 @@ public class Protein {
   private List<SequencePart> tmDomains;
   private List<SequencePart> inOutDomains;
   private List<SequencePart> funcDomains;
-  private static int MINLENGTH;
-  private static int MAXLENGTH;
+  private static int MIN_EXT_FRAGMENT_LEN = 40;
+  private static int MAX_EXT_FRAGMENT_LEN = 70;
   private List<SequencePart> allDomains;
   private List<String> taxonomy;
 
@@ -21,12 +21,12 @@ public class Protein {
     return acNum;
   }
 
-  public static void setMinLength(int length) {
-    MINLENGTH = length;
+  public static void setMinFragmentLength(int length) {
+    MIN_EXT_FRAGMENT_LEN = length;
   }
 
-  public static void setMaxLength(int length) {
-    MAXLENGTH = length;
+  public static void setMaxFragmentLength(int length) {
+    MAX_EXT_FRAGMENT_LEN = length;
   }
 
   public Boolean getBeginsInside() {
@@ -198,16 +198,16 @@ public class Protein {
     int externalBeginning = tmEnding + 1;
     int externalEnding;
     if (i == tmDomains.size() - 1) { // the last part.. checking against the end of the whole sequence      
-      externalEnding = getSequence().length();
+      externalEnding = getSequence().length() - 1;
     } else {
       externalEnding = tmDomains.get(i + 1).getFrom() - 1;
     }
-    int diff = externalEnding - externalBeginning;
-    if (diff >= MINLENGTH - 1) {
-      if (diff >= MAXLENGTH - 1) {
-        return new SequencePart(tmBeginning, tmEnding + MAXLENGTH, "TM");
+    int diff = externalEnding - tmEnding;
+    if (diff >= MIN_EXT_FRAGMENT_LEN) {
+      if (diff > MAX_EXT_FRAGMENT_LEN) {
+        return new SequencePart(tmBeginning, tmEnding + MAX_EXT_FRAGMENT_LEN, "MIXED");
       } else {
-        return new SequencePart(tmBeginning, externalEnding, "TM");
+        return new SequencePart(tmBeginning, externalEnding, "MIXED");
       }
     }
     return null;
@@ -226,26 +226,48 @@ public class Protein {
       externalBeginning = tmDomains.get(i - 1).getTo() + 1;
     }
     int diff = externalEnding - externalBeginning;
-    if (diff >= MINLENGTH - 1) {
-      if (diff >= MAXLENGTH - 1) {
-        return new SequencePart(tmBeginning - MAXLENGTH, tmEnding, "TM");
+    if (diff >= MIN_EXT_FRAGMENT_LEN - 1) {
+      if (diff >= MAX_EXT_FRAGMENT_LEN - 1) {
+        return new SequencePart(tmBeginning - MAX_EXT_FRAGMENT_LEN, tmEnding, "TM");
       } else {
         return new SequencePart(externalBeginning, tmEnding, "TM");
       }
     }
     return null;
   }
-  
+
   public SequencePart getSeqForTmPart(int i) {
     getTmDomains();
-    
+    if (i >= 0 && i < tmDomains.size()) {
+      return tmDomains.get(i);
+    }
+    return null;
+  }
+
+  
+  public SequencePart getSeqForTmPlusExtraPart(int i) {
+    getTmDomains();
     if ((!beginsInside && i % 2 == 1 || beginsInside && i % 2 == 0)) {
       return getForwardSection(i);
     } else { 
-      return getBackwardSection(i);
+      return null;
     }
   }
 
+  public List<SequencePart> getExtracellularFragmentsAfterTmPart() {
+    getTmDomains();
+    List<SequencePart> result = new ArrayList<SequencePart>();
+    if (hasTmOrientationInfo()) {
+      for (int i = 0; i < tmDomains.size(); i++) {
+        SequencePart sp = getForwardSection(i);
+        if (null != sp) {
+          result.add(sp);
+        }
+      }
+    }
+    return result;
+  }
+  
   public boolean hasTmOrientationInfo() {
     if (!inOutDomains.isEmpty()) {
       return true;

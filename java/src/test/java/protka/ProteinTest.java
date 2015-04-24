@@ -131,8 +131,8 @@ public class ProteinTest {
     protein4.setLines(lines4);
     protein5.setLines(lines5);
     
-    Protein.setMaxLength(70);
-    Protein.setMinLength(40);
+    Protein.setMaxFragmentLength(70);
+    Protein.setMinFragmentLength(40);
   }
 
   @Test
@@ -143,27 +143,27 @@ public class ProteinTest {
 
   @Test
   public void testReadTmNumbers() {
-    List<SequencePart> tmNumbers = protein1.getTmNumbers();
-    assertNotNull(tmNumbers);
-    assertEquals(1, tmNumbers.size());
+    List<SequencePart> tmDomains = protein1.getTmDomains();
+    assertNotNull(tmDomains);
+    assertEquals(1, tmDomains.size());
     // -1 because we index from 0, not from 1 as the data file
-    assertEquals(12, tmNumbers.get(0).getFrom());
-    assertEquals(30, tmNumbers.get(0).getTo());
+    assertEquals(12, tmDomains.get(0).getFrom());
+    assertEquals(30, tmDomains.get(0).getTo());
 
-    tmNumbers = protein2.getTmNumbers();
-    assertNotNull(tmNumbers);
-    assertEquals(4, tmNumbers.size());
+    tmDomains = protein2.getTmDomains();
+    assertNotNull(tmDomains);
+    assertEquals(4, tmDomains.size());
   }
 
   @Test
   public void testReadMoreTmNumbers() {
-    List<SequencePart> tmNumbers = protein2.getTmNumbers();
-    assertNotNull(tmNumbers);
-    assertEquals(4, tmNumbers.size());
-    assertEquals(11, tmNumbers.get(0).getFrom());
-    assertEquals(20, tmNumbers.get(0).getTo());
-    assertEquals(122, tmNumbers.get(3).getFrom());
-    assertEquals(122, tmNumbers.get(3).getTo());
+    List<SequencePart> tmDomains = protein2.getTmDomains();
+    assertNotNull(tmDomains);
+    assertEquals(4, tmDomains.size());
+    assertEquals(11, tmDomains.get(0).getFrom());
+    assertEquals(20, tmDomains.get(0).getTo());
+    assertEquals(122, tmDomains.get(3).getFrom());
+    assertEquals(122, tmDomains.get(3).getTo());
   }
 
   @Test
@@ -177,45 +177,45 @@ public class ProteinTest {
   public void testGetSeqForTmPart() {
     protein1.setBeginsInside(false);
     SequencePart seqPart = protein1.getSeqForTmPart(0);
-    assertNull(seqPart);
+    assertNotNull(seqPart);
+    assertEquals(12, seqPart.getFrom()); // indexing is different!
+    assertEquals(30, seqPart.getTo());
+
     protein1.setBeginsInside(true);
-    seqPart = protein1.getSeqForTmPart(0);
+    seqPart = protein1.getSeqForTmPlusExtraPart(0);
     assertEquals(12, seqPart.getFrom());
     assertEquals(100, seqPart.getTo());
 
-    protein3.setBeginsInside(true);
-    seqPart = protein3.getSeqForTmPart(0);
+    protein1.setBeginsInside(false);
+    seqPart = protein1.getSeqForTmPlusExtraPart(0);
     assertNull(seqPart);
-    protein3.setBeginsInside(false);
-    seqPart = protein3.getSeqForTmPart(0);
-    assertEquals(169, seqPart.getFrom());
-    assertEquals(249, seqPart.getTo());
+    
+    //protein3.setBeginsInside(true); // not needed
+    seqPart = protein3.getSeqForTmPlusExtraPart(0);
+    assertNull(seqPart); // too short
 
     protein2.setBeginsInside(false);
-    seqPart = protein2.getSeqForTmPart(0);
-    assertNull(seqPart);
-    seqPart = protein2.getSeqForTmPart(1);
+    seqPart = protein2.getSeqForTmPlusExtraPart(1);
     assertEquals(22, seqPart.getFrom());
     assertEquals(94, seqPart.getTo());
 
     protein2.setBeginsInside(true);
-    seqPart = protein2.getSeqForTmPart(0);
-    assertNull(seqPart);
-    seqPart = protein2.getSeqForTmPart(1);
+    seqPart = protein2.getSeqForTmPlusExtraPart(1);
     assertNull(seqPart);
   }
 
   @Test
   public void testProt4() {
-    protein4.setBeginsInside(false);
-    List<SequencePart> tmNumbers = protein4.getTmNumbers();
-    assertEquals(3, tmNumbers.size());
-    assertEquals(66, protein4.getTmNumbers().get(0).getFrom());
-    assertEquals(86, protein4.getTmNumbers().get(0).getTo());
-    assertEquals(202, protein4.getTmNumbers().get(2).getTo());
-    SequencePart seqPart = protein4.getSeqForTmPart(0);
-    assertEquals(0, seqPart.getFrom());
-    assertEquals(86, seqPart.getTo());
+    //protein4.setBeginsInside(false);  // not needed
+    List<SequencePart> tmDomains = protein4.getTmDomains();
+    assertEquals(3, tmDomains.size());
+    assertEquals(66, protein4.getTmDomains().get(0).getFrom());
+    assertEquals(86, protein4.getTmDomains().get(0).getTo());
+    assertEquals(202, protein4.getTmDomains().get(2).getTo());
+    SequencePart seqPart = protein4.getSeqForTmPlusExtraPart(0);
+    assertNull(seqPart); // not extracellular!
+    seqPart = protein4.getSeqForTmPlusExtraPart(1);
+    assertNull(seqPart); // not long enough!
   }
 
   @Test
@@ -230,14 +230,17 @@ public class ProteinTest {
 
   @Test
   public void testProtein5A() {
-    Protein.setMinLength(40);
+    Protein.setMinFragmentLength(60);
+    Protein.setMaxFragmentLength(90);
     assertTrue(protein5.getBeginsInside());
-    List<SequencePart> tmNumbers = protein5.getTmNumbers();
+    List<SequencePart> tmDomains = protein5.getTmDomains();
     
-    assertEquals(4, tmNumbers.size());
-    for (int i = 1; i < 4; i++) {
-      assertNull(protein5.getSeqForTmPart(i));
-    }
+    assertEquals(4, tmDomains.size());
+    assertNull(protein5.getSeqForTmPlusExtraPart(0)); // too short
+    assertNull(protein5.getSeqForTmPlusExtraPart(1)); // not extracellular
+    assertNull(protein5.getSeqForTmPlusExtraPart(2)); // too short
+    assertNull(protein5.getSeqForTmPlusExtraPart(3)); // not extracellular
+
     List<SequencePart> domains = protein5.getFuncDomains();
     assertEquals(1, domains.size());
     
@@ -258,14 +261,14 @@ public class ProteinTest {
 
   @Test
   public void testProtein5B() {
-    Protein.setMinLength(30); // corner case
+    Protein.setMinFragmentLength(30); // corner case
     
     assertTrue(protein5.getBeginsInside());
-    List<SequencePart> tmNumbers = protein5.getTmNumbers();
+    List<SequencePart> tmDomains = protein5.getTmDomains();
     
-    assertEquals(4, tmNumbers.size());
-    int from = tmNumbers.get(0).getFrom();
-    int to = tmNumbers.get(0).getTo();
+    assertEquals(4, tmDomains.size());
+    int from = tmDomains.get(0).getFrom();
+    int to = tmDomains.get(0).getTo();
     
     assertEquals(22, from);
     assertEquals(44, to);
@@ -273,12 +276,11 @@ public class ProteinTest {
     String tmSeq = protein5.getSequencePart(from, to);
     assertEquals("IWLTVLIVFRIVLTAVGGESIYY", tmSeq);
 
-    SequencePart seqPart0 = protein5.getSeqForTmPart(0);
+    SequencePart seqPart0 = protein5.getSeqForTmPlusExtraPart(0);
     assertEquals(22, seqPart0.getFrom());
     assertEquals(74, seqPart0.getTo());
-    SequencePart seqPart1 = protein5.getSeqForTmPart(1);
-    assertEquals(45, seqPart1.getFrom());
-    assertEquals(94, seqPart1.getTo());
+    SequencePart seqPart1 = protein5.getSeqForTmPlusExtraPart(1); // not extracellular
+    assertNull(seqPart1);
   }
   
   @Test

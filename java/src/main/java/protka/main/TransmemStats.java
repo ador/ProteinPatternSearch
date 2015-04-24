@@ -29,7 +29,7 @@ public class TransmemStats {
         if (p.hasTmOrientationInfo()) {
           tmProteinsWithTIE++;
         }
-        if (null != p.getTmNumbers() && ! p.getTmNumbers().isEmpty()) {
+        if (null != p.getTmDomains() && ! p.getTmDomains().isEmpty()) {
           tmProteinsWithT++;
         }
         if (allProteins % 1000 == 0) {

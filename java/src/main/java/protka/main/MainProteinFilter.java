@@ -62,7 +62,7 @@ public class MainProteinFilter {
     outFasta.close(); 
   }
   
-  public void compute() throws IOException {
+  private Map<String, FastaItem> readFasta() throws IOException {
     fastaReader = new FastaReader(inFasta);
     Map<String, FastaItem> fastaMap = new HashMap<String, FastaItem>(600000);
 
@@ -76,7 +76,14 @@ public class MainProteinFilter {
       }
       ++counter;
     }
+    return fastaMap;
+  }
+  
+  
+  public void compute() throws IOException {
 
+    Map<String, FastaItem> fastaMap = readFasta();
+    
     ProteinFilter proteinFilter = new ProteinFilter();
 
     // optional property
@@ -102,7 +109,7 @@ public class MainProteinFilter {
 
     Protein protein;
 
-    counter = 1;
+    int counter = 1;
     while ((protein = swissprotReader.getNextProtein()) != null) {
       if (proteinFilter.match(protein)
           && fastaMap.containsKey(protein.getAcNum())) {

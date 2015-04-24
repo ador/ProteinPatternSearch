@@ -14,6 +14,10 @@ public class FastaItem {
     acNum = ac;
   }
 
+  public String getHeader() {
+    return headerRow;
+  }
+  
   public void addSeqRow(String s) {
     sequenceRows.add(s);
   }
