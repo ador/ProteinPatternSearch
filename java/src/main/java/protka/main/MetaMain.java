@@ -32,7 +32,7 @@ public class MetaMain {
       case FILTER_ROWS: FilterRows.main(argsToPass); break;
       case FASTA_AND_DAT_FILTER: MainProteinFilter.main(argsToPass); break;
       case TM_STATS: TransmemStats.main(argsToPass); break;
-      case TM_EXT_FRAGMENTS: TmFragmentFilter.main(argsToPass); break;
+      case TM_EXT_FRAGMENTS: CutTmOutFragments.main(argsToPass); break;
       default: printHelp(); break;
     }
   }
