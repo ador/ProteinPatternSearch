@@ -226,11 +226,11 @@ public class Protein {
       externalBeginning = tmDomains.get(i - 1).getTo() + 1;
     }
     int diff = externalEnding - externalBeginning;
-    if (diff >= MIN_EXT_FRAGMENT_LEN - 1) {
-      if (diff >= MAX_EXT_FRAGMENT_LEN - 1) {
-        return new SequencePart(tmBeginning - MAX_EXT_FRAGMENT_LEN, tmEnding, "TM");
+    if (diff >= MIN_EXT_FRAGMENT_LEN) {
+      if (diff > MAX_EXT_FRAGMENT_LEN) {
+        return new SequencePart(tmBeginning - MAX_EXT_FRAGMENT_LEN, tmEnding, "MIXED");
       } else {
-        return new SequencePart(externalBeginning, tmEnding, "TM");
+        return new SequencePart(externalBeginning, tmEnding, "MIXED");
       }
     }
     return null;
@@ -244,22 +244,44 @@ public class Protein {
     return null;
   }
 
-  
-  public SequencePart getSeqForTmPlusExtraPart(int i) {
+  public SequencePart getSeqForTmPlusExtraPartFwd(int i) {
     getTmDomains();
     if ((!beginsInside && i % 2 == 1 || beginsInside && i % 2 == 0)) {
       return getForwardSection(i);
-    } else { 
+    } else {
       return null;
     }
   }
 
+  public SequencePart getSeqForTmPlusExtraPartBwd(int i) {
+    getTmDomains();
+    if ((!beginsInside && i % 2 == 0 || beginsInside && i % 2 == 1)) {
+      return getBackwardSection(i);
+    } else {
+      return null;
+    }
+  }
+  
   public List<SequencePart> getExtracellularFragmentsAfterTmPart() {
     getTmDomains();
     List<SequencePart> result = new ArrayList<SequencePart>();
     if (hasTmOrientationInfo()) {
       for (int i = 0; i < tmDomains.size(); i++) {
-        SequencePart sp = getForwardSection(i);
+        SequencePart sp = getSeqForTmPlusExtraPartFwd(i);
+        if (null != sp) {
+          result.add(sp);
+        }
+      }
+    }
+    return result;
+  }
+
+  public List<SequencePart> getExtracellularFragmentsBeforeTmPart() {
+    getTmDomains();
+    List<SequencePart> result = new ArrayList<SequencePart>();
+    if (hasTmOrientationInfo()) {
+      for (int i = 0; i < tmDomains.size(); i++) {
+        SequencePart sp = getSeqForTmPlusExtraPartBwd(i);
         if (null != sp) {
           result.add(sp);
         }

@@ -27,14 +27,29 @@ public class TmFragmentFilter {
     return maxFragmentLen;
   }
 
+  private String createHeader(Protein protein, SequencePart sp, char where) {
+    String header = "> " + protein.getAcNum() + "|" + (sp.getFrom() + 1) + "-" + (sp.getTo() + 1) + 
+          "|" + where; // where='a' means that the extracellular part is after the TM part; 'b' means before
+    return header;
+  }
+  
   public List<FastaItem> getFragments(Protein protein) {
     Protein.setMinFragmentLength(minFragmentLen);
     Protein.setMaxFragmentLength(maxFragmentLen);
-    List<SequencePart> parts = protein.getExtracellularFragmentsAfterTmPart();
+    List<SequencePart> partsAfter = protein.getExtracellularFragmentsAfterTmPart();
+    List<SequencePart> partsBefore = protein.getExtracellularFragmentsBeforeTmPart();
     List<FastaItem> result = new ArrayList<FastaItem>();
-    for (SequencePart sp : parts) {
+    for (SequencePart sp : partsAfter) {
       if (null != sp) {
-        String header = "> " + protein.getAcNum() + "|" + (sp.getFrom() + 1) + "-" + (sp.getTo() + 1);
+        String header = createHeader(protein, sp, 'a');
+        FastaItem newItem = new FastaItem(header, protein.getAcNum());
+        newItem.addSeqRow(protein.getSequencePart(sp.getFrom(), sp.getTo()));
+        result.add(newItem);
+      }
+    }
+    for (SequencePart sp : partsBefore) {
+      if (null != sp) {
+        String header = createHeader(protein, sp, 'b');
         FastaItem newItem = new FastaItem(header, protein.getAcNum());
         newItem.addSeqRow(protein.getSequencePart(sp.getFrom(), sp.getTo()));
         result.add(newItem);

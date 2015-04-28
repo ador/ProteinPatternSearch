@@ -61,7 +61,7 @@ public class TmFragmentFilterTest {
     tmFilter.setMaxFragmentLength(40);
     List<String> data = new ArrayList<String>();
     data.add("ID   001R_FRG3G              Reviewed;         256 AA.");
-    data.add("AC   Q6GZX4;");
+    data.add("AC   Q6GZX2;");
     data.add("KW   asas;Amls");
     data.add("KW   Transmembrane;Amls");
     data.add("KW   Metal");
@@ -89,11 +89,12 @@ public class TmFragmentFilterTest {
     protein.setLines(data);
     List<FastaItem> result = tmFilter.getFragments(protein);
     assertNotNull(result);
-    // expecting 0 results because the extracellular part is BEFORE the TM part
-    assertEquals(0, result.size());
+    // expecting 1 result: the extracellular part BEFORE the TM part
+    assertEquals(1, result.size());
+    assertNotNull(result.get(0));
+    assertEquals("> Q6GZX2|269-332|b", result.get(0).getHeader());
   }
-  
-  
+
   @Test
   public void testFilter3() {
     TmFragmentFilter tmFilter = new TmFragmentFilter();
@@ -131,13 +132,13 @@ public class TmFragmentFilterTest {
     assertTrue(protein.getBeginsInside());
     assertEquals(1, result.size());
     assertNotNull(result.get(0));
-    assertEquals("> Q6GZX4|209-256", result.get(0).getHeader());
+    assertEquals("> Q6GZX4|209-256|a", result.get(0).getHeader());
   }
 
   @Test
   public void testFilter4() {
     TmFragmentFilter tmFilter = new TmFragmentFilter();
-    tmFilter.setMinFragmentLength(30);
+    tmFilter.setMinFragmentLength(20);
     tmFilter.setMaxFragmentLength(40);
     List<String> data = new ArrayList<String>();
     data.add("ID   001R_FRG3G              Reviewed;         256 AA.");
@@ -172,10 +173,12 @@ public class TmFragmentFilterTest {
     Protein protein = new Protein();
     protein.setLines(data);
     List<FastaItem> result = tmFilter.getFragments(protein);
-    assertEquals(2, result.size());
+    assertEquals(3, result.size());
     
-    assertEquals("> Q6GZX4|39-100", result.get(0).getHeader());
+    assertEquals("> Q6GZX4|39-100|a", result.get(0).getHeader());
     assertEquals("WSPPRVQVECPKAPVEWNNPPSEKGLIVGHFSGIKYKGEKAQASEVDVNKMCCWVSKFKDAM", result.get(0).getSequenceRows().get(0));
+    assertEquals("> Q6GZX4|209-256|a", result.get(1).getHeader());
+    assertEquals("> Q6GZX4|107-168|b", result.get(2).getHeader());
   }
 
 }

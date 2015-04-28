@@ -182,25 +182,25 @@ public class ProteinTest {
     assertEquals(30, seqPart.getTo());
 
     protein1.setBeginsInside(true);
-    seqPart = protein1.getSeqForTmPlusExtraPart(0);
+    seqPart = protein1.getSeqForTmPlusExtraPartFwd(0);
     assertEquals(12, seqPart.getFrom());
     assertEquals(100, seqPart.getTo());
 
     protein1.setBeginsInside(false);
-    seqPart = protein1.getSeqForTmPlusExtraPart(0);
+    seqPart = protein1.getSeqForTmPlusExtraPartFwd(0);
     assertNull(seqPart);
     
     //protein3.setBeginsInside(true); // not needed
-    seqPart = protein3.getSeqForTmPlusExtraPart(0);
+    seqPart = protein3.getSeqForTmPlusExtraPartFwd(0);
     assertNull(seqPart); // too short
 
     protein2.setBeginsInside(false);
-    seqPart = protein2.getSeqForTmPlusExtraPart(1);
+    seqPart = protein2.getSeqForTmPlusExtraPartFwd(1);
     assertEquals(22, seqPart.getFrom());
     assertEquals(94, seqPart.getTo());
 
     protein2.setBeginsInside(true);
-    seqPart = protein2.getSeqForTmPlusExtraPart(1);
+    seqPart = protein2.getSeqForTmPlusExtraPartFwd(1);
     assertNull(seqPart);
   }
 
@@ -212,9 +212,9 @@ public class ProteinTest {
     assertEquals(66, protein4.getTmDomains().get(0).getFrom());
     assertEquals(86, protein4.getTmDomains().get(0).getTo());
     assertEquals(202, protein4.getTmDomains().get(2).getTo());
-    SequencePart seqPart = protein4.getSeqForTmPlusExtraPart(0);
+    SequencePart seqPart = protein4.getSeqForTmPlusExtraPartFwd(0);
     assertNull(seqPart); // not extracellular!
-    seqPart = protein4.getSeqForTmPlusExtraPart(1);
+    seqPart = protein4.getSeqForTmPlusExtraPartFwd(1);
     assertNull(seqPart); // not long enough!
   }
 
@@ -236,10 +236,13 @@ public class ProteinTest {
     List<SequencePart> tmDomains = protein5.getTmDomains();
     
     assertEquals(4, tmDomains.size());
-    assertNull(protein5.getSeqForTmPlusExtraPart(0)); // too short
-    assertNull(protein5.getSeqForTmPlusExtraPart(1)); // not extracellular
-    assertNull(protein5.getSeqForTmPlusExtraPart(2)); // too short
-    assertNull(protein5.getSeqForTmPlusExtraPart(3)); // not extracellular
+    assertNull(protein5.getSeqForTmPlusExtraPartFwd(0)); // too short
+    assertNull(protein5.getSeqForTmPlusExtraPartFwd(1)); // not extracellular
+    assertNull(protein5.getSeqForTmPlusExtraPartBwd(1)); // too short
+    assertNull(protein5.getSeqForTmPlusExtraPartBwd(2)); // not extracellular
+    assertNull(protein5.getSeqForTmPlusExtraPartBwd(3)); // too short
+    assertNull(protein5.getSeqForTmPlusExtraPartFwd(2)); // too short
+    assertNull(protein5.getSeqForTmPlusExtraPartFwd(3)); // not extracellular
 
     List<SequencePart> domains = protein5.getFuncDomains();
     assertEquals(1, domains.size());
@@ -261,7 +264,7 @@ public class ProteinTest {
 
   @Test
   public void testProtein5B() {
-    Protein.setMinFragmentLength(30); // corner case
+    Protein.setMinFragmentLength(29); // corner case
     
     assertTrue(protein5.getBeginsInside());
     List<SequencePart> tmDomains = protein5.getTmDomains();
@@ -276,11 +279,12 @@ public class ProteinTest {
     String tmSeq = protein5.getSequencePart(from, to);
     assertEquals("IWLTVLIVFRIVLTAVGGESIYY", tmSeq);
 
-    SequencePart seqPart0 = protein5.getSeqForTmPlusExtraPart(0);
+    SequencePart seqPart0 = protein5.getSeqForTmPlusExtraPartFwd(0);
     assertEquals(22, seqPart0.getFrom());
     assertEquals(74, seqPart0.getTo());
-    SequencePart seqPart1 = protein5.getSeqForTmPlusExtraPart(1); // not extracellular
+    SequencePart seqPart1 = protein5.getSeqForTmPlusExtraPartFwd(1); // not extracellular
     assertNull(seqPart1);
+    assertNotNull(protein5.getSeqForTmPlusExtraPartBwd(1));
   }
   
   @Test
@@ -296,7 +300,6 @@ public class ProteinTest {
     
     String species = protein5.getSpecies();
     assertEquals("Pan troglodytes (Chimpanzee).", species);
-    
   }
 
 }
