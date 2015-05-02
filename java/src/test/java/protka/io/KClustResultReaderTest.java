@@ -16,14 +16,6 @@ import protka.io.KClustResultReader;
 
 public class KClustResultReaderTest {
 
-  private final String representatives =
-    "> Q09160|239-332|b\n"
-    + "LTWQRDGEDQTQDTELVETRPAGDGTFQKWAAVVVPSGKEKRYTCHVQHEGLPEPLTLRWEPSSQPTIPIVGIIAGLVLLGAVIAGAVVAAVMW\n"
-    + "> Q99LR1|75-165|a\n"
-    + "ILLCVLGFYIAIPFLVKLCPGIQAKLIFLNFVRVPYFIDLKKPQDQGLNHTCNYYLQPEDDVTIGVWHTIPSVWWKNAQGKDQMWYEDALA\n"
-    + "> Q24093|5-92|a\n"
-    + "FLTLIAVIVCILFRILNVHSQPLKPSVWCLDAHFLDCLYKIAPVLREPYIPPRLWGFSGHVQTVLHSIVGRVRCPWPLGERVYMSLK\n";
-
   private final String clusters =
     "# 11\n"
     + "1 1\n"
@@ -75,7 +67,6 @@ public class KClustResultReaderTest {
     + "> Q24093|5-92|a\n"
     + "FLTLIAVIVCILFRILNVHSQPLKPSVWCLDAHFLDCLYKIAPVLREPYIPPRLWGFSGHVQTVLHSIVGRVRCPWPLGERVYMSLKD\n";
   
-  private InputStream isRepresentatives;
   private InputStream isClusters;
   private InputStream isHeaders;
   private InputStream isFastaAll;
@@ -84,7 +75,6 @@ public class KClustResultReaderTest {
   
   @Before
   public void setUp() {
-    isRepresentatives = new ByteArrayInputStream(representatives.getBytes());
     isClusters = new ByteArrayInputStream(clusters.getBytes());
     isHeaders = new ByteArrayInputStream(headers.getBytes());
     isFastaAll = new ByteArrayInputStream(fastaInput.getBytes());
@@ -122,5 +112,29 @@ public class KClustResultReaderTest {
       e.printStackTrace();
     }
   }
-  
+
+  @Test
+  public void testClusters() {
+    try {
+      reader.readClusters();
+      List<List<FastaItem> > result = reader.getClusters();
+      assertEquals(3, result.size());
+      List<FastaItem> clusterA = result.get(0);
+      List<FastaItem> clusterB = result.get(1);
+      List<FastaItem> clusterC = result.get(2);
+      assertNotNull(clusterA);
+      assertNotNull(clusterB);
+      assertNotNull(clusterC);
+      assertEquals(8, clusterA.size());
+      assertEquals(2, clusterB.size());
+      assertEquals(1, clusterC.size());
+      assertNotNull(clusterA.get(0));
+      assertEquals("> Q09160|239-332|b", clusterA.get(0).getHeader());
+      assertEquals("> P16210|239-332|b", clusterA.get(3).getHeader());
+      assertEquals("> Q24093|5-92|a", clusterC.get(0).getHeader());
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
 }

@@ -21,7 +21,8 @@ public class KClustResultReader {
   private BufferedReader clustersReader;
   private BufferedReader headersReader;
   private Map<String, FastaItem> allFastaItems; // keys are headers
-  private Map<Integer, String> fastaItemIdToHeaderMap;  
+  private Map<Integer, String> fastaItemIdToHeaderMap;
+  private List<List<FastaItem> > clusteringResult;
   
   public void setClustersInput(InputStream clustersStream) {
     isClusters = clustersStream;
@@ -69,29 +70,81 @@ public class KClustResultReader {
     String line;
     Map<Integer, String> ret = new HashMap<Integer, String>();
     while ((line = headersReader.readLine()) != null) {
-      System.out.println("HR: " + line);
       String[] idAndHeader = line.split(" > ");
       if (idAndHeader.length != 2) {
         System.err.println("Invalid header line in header file: \n" + line);
       } else {
         Integer id = Integer.parseInt(idAndHeader[0]);
-        String header = idAndHeader[1];
+        String header = "> " + idAndHeader[1].trim();
         ret.put(id, header);
       }
     }
     return ret;
   }
-  
+ 
+  private boolean checkClustersHeader(String headerOfKClustClustersFile) {
+    if (headerOfKClustClustersFile.charAt(0) != '#') {
+      System.err.println("Not a valid KClust result file of clusters!");
+      return false;
+    }
+    int strLen = headerOfKClustClustersFile.length();
+    String numStr = headerOfKClustClustersFile.substring(1, strLen).trim();
+    int num = Integer.parseInt(numStr);
+    if (getNumOfFastaItems() != num) {
+      System.err.println("Sizes differ! (fasta items from fasta file: " +
+          getNumOfFastaItems() + ", and kclust clustering result: " +
+          num + ")");
+      return false;
+    }
+    if (getSizeOfHeadersMap() != num) {
+      System.err.println("Sizes differ! (headers from kclust: " +
+          getSizeOfHeadersMap() + ", and kclust clustering result:" +
+          num +")");
+      return false;
+    }
+    return true;
+  }
+ 
+  private List<List<FastaItem> > readClustersInput() throws IOException {
+    String line = clustersReader.readLine(); // header with num of lines
+    checkClustersHeader(line);
+    List<List<FastaItem> > ret = new ArrayList<List<FastaItem> >();
+    Integer id;
+    Integer clusId = -1;
+    List<FastaItem> lastCluster = null;
+    while ((line = clustersReader.readLine()) != null) {
+      String[] idAndClusId = line.split(" ");
+      if (idAndClusId.length != 2) {
+        System.err.println("Invalid line in clusters file: \n" + line);
+      } else {
+        id = Integer.parseInt(idAndClusId[0]);
+        Integer clusIdNow = Integer.parseInt(idAndClusId[1].trim());
+        if (clusId != clusIdNow) {
+          lastCluster = new ArrayList<FastaItem>();
+          ret.add(lastCluster);
+        }
+        clusId = clusIdNow;
+        String headerForItem = fastaItemIdToHeaderMap.get(id);
+        FastaItem item = allFastaItems.get(headerForItem);
+        if (null == item) {
+          System.err.println("null item added: for header ");
+        }
+        lastCluster.add(item);        
+      }
+    }
+    return ret;
+  }
+ 
   public void readClusters() throws IOException {
     if (!checIfkAllInputsSet()) {
-      System.err.println("Stopping.");
+      System.err.println("Error. Stopping.");
       return;
     }
     allFastaItems = readFastaInput();
     fastaItemIdToHeaderMap = readHeadersInput();
-    //readClustersInput();
-  
+    clusteringResult = readClustersInput();
   }
+
   
   public int getSizeOfHeadersMap() {
     return fastaItemIdToHeaderMap.size();
@@ -102,13 +155,11 @@ public class KClustResultReader {
   }
 
   public int getNumOfClusters() {
-    return 3;
-    // todo
+    return clusteringResult.size();
   }
 
   public List<List<FastaItem> > getClusters() {
-    return null;
-    // todo
+    return clusteringResult;
   }
   
 }
