@@ -100,11 +100,27 @@ public class KClustResultReaderTest {
   }
 
   @Test
+  public void testSizes() {
+    try {
+      reader.readClusters();
+      // in this example we have 11 fasta items, so 11 header rows must be read
+      assertEquals(11, reader.getSizeOfHeadersMap());
+      assertEquals(11, reader.getSizeOfHeadersMap());
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
+  @Test
   public void testNumOfClusters() {
-    // in this example we expect 3 clusters
-    reader.readClusters();
-    int numOfClusters = reader.getNumOfClusters();
-    assertEquals(3, numOfClusters);
+    try {
+      // in this example we expect 3 clusters
+      reader.readClusters();
+      int numOfClusters = reader.getNumOfClusters();
+      assertEquals(3, numOfClusters);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
   }
   
 }
