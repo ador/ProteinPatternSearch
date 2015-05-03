@@ -109,8 +109,8 @@ public class KClustResultReader {
     String line = clustersReader.readLine(); // header with num of lines
     checkClustersHeader(line);
     List<List<FastaItem> > ret = new ArrayList<List<FastaItem> >();
-    Integer id;
-    Integer clusId = -1;
+    int id;
+    int clusId = -1;
     List<FastaItem> lastCluster = null;
     while ((line = clustersReader.readLine()) != null) {
       String[] idAndClusId = line.split(" ");
@@ -118,7 +118,8 @@ public class KClustResultReader {
         System.err.println("Invalid line in clusters file: \n" + line);
       } else {
         id = Integer.parseInt(idAndClusId[0]);
-        Integer clusIdNow = Integer.parseInt(idAndClusId[1].trim());
+        int clusIdNow = Integer.parseInt(idAndClusId[1].trim());
+        
         if (clusId != clusIdNow) {
           lastCluster = new ArrayList<FastaItem>();
           ret.add(lastCluster);
@@ -127,9 +128,10 @@ public class KClustResultReader {
         String headerForItem = fastaItemIdToHeaderMap.get(id);
         FastaItem item = allFastaItems.get(headerForItem);
         if (null == item) {
-          System.err.println("null item added: for header ");
+          System.err.println("Warning: null item found for header:\n" + headerForItem);
+        } else {
+          lastCluster.add(item);
         }
-        lastCluster.add(item);        
       }
     }
     return ret;

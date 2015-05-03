@@ -42,6 +42,7 @@ public class SplitFastaToClusters {
     isKClusHeaders = new FileInputStream(inputKClusResultsPath + File.separator + "headers.dmp");
     isKClusClusters = new FileInputStream(inputKClusResultsPath + File.separator + "clusters.dmp");
     outFastaDir = properties.getProperty("outputFastaDir");
+    minClusterSize = Integer.parseInt(properties.getProperty("minClusterSize"));
     outFileNameBeginnings = properties.getProperty("outFileNameBeginnings");
     File targetFile = new File(outFastaDir); 
     targetFile.mkdirs();    
@@ -58,25 +59,33 @@ public class SplitFastaToClusters {
   private int writeClustersToFiles() throws IOException {
     kClusReader.readClusters();
     List<List<FastaItem> > allClusters = kClusReader.getClusters();
+    System.out.println("ALL clusters read: " + allClusters.size() + "\n\n");
     int clustersWritten = 0;
     int clustersDiscarded = 0;
+    int totalItems = 0;
     for (int i = 0; i < allClusters.size(); ++i) {
       List<FastaItem> clu = allClusters.get(i);
       int cluSize = clu.size();
-      String outFileName = outFastaDir + File.separator +
-          outFileNameBeginnings + "_" + (i + 1) + ".fasta";
-      FileOutputStream fos = new FileOutputStream(outFileName);
-      fastaWriter = new FastaWriter(fos);
+      totalItems += cluSize;
       if (cluSize >= minClusterSize) {
+        String outFileName = outFastaDir + File.separator +
+            outFileNameBeginnings + "_" + (clustersWritten + 1) + ".fasta";
+        FileOutputStream fos = new FileOutputStream(outFileName);
+        if (clustersWritten > 0) {
+          fastaWriter.closeOS();
+        }
+        fastaWriter = new FastaWriter(fos);
         fastaWriter.writeFastaList(clu);
         clustersWritten++;
       } else {
         clustersDiscarded++;
       }
     }
-    System.out.println("Clusters written: " + clustersWritten);
+    fastaWriter.closeOS();
+    System.out.println("FastaItems clustered in total: " + totalItems);
+    System.out.println("Total num of clusters: " + (clustersDiscarded + clustersWritten));
     System.out.println("Clusters discarded (too small): " + clustersDiscarded);
-    System.out.println("Total: " + (clustersDiscarded + clustersWritten));
+    System.out.println("Clusters written: " + clustersWritten + " to path: " + outFastaDir);
     return clustersWritten;
   }
   
@@ -84,8 +93,6 @@ public class SplitFastaToClusters {
     isFasta.close();
     isKClusClusters.close();
     isKClusHeaders.close();
-    osFasta.flush();
-    osFasta.close();
   }
   
   public static void main(String args[]) throws IOException {
