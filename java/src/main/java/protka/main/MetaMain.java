@@ -5,7 +5,8 @@ import java.io.IOException;
 public class MetaMain {
 
   public enum Task {
-    COMPUTE_STATS, FILTER_DAT_FEATURES, FILTER_ROWS, FASTA_AND_DAT_FILTER, TM_STATS, TM_EXT_FRAGMENTS
+    COMPUTE_STATS, FILTER_DAT_FEATURES, FILTER_ROWS, FASTA_AND_DAT_FILTER, TM_STATS,
+    TM_EXT_FRAGMENTS, SPLIT_FASTA_TO_CLUSTERS
   }
 
   public static void printHelp() {
@@ -33,6 +34,7 @@ public class MetaMain {
       case FASTA_AND_DAT_FILTER: MainProteinFilter.main(argsToPass); break;
       case TM_STATS: TransmemStats.main(argsToPass); break;
       case TM_EXT_FRAGMENTS: CutTmOutFragments.main(argsToPass); break;
+      case SPLIT_FASTA_TO_CLUSTERS: SplitFastaToClusters.main(argsToPass); break;
       default: printHelp(); break;
     }
   }
