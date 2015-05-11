@@ -35,10 +35,10 @@ public class WekaClustering {
 
         SimpleKMeans kmeans = new SimpleKMeans();
 
-        kmeans.setSeed(Integer.parseInt(properties.getProperty("randomSeed")));
+        kmeans.setSeed(Integer.parseInt(properties.getProperty("randomSeed").trim()));
 
         int numberOfClusters = Integer.parseInt(properties
-            .getProperty("numberOfClusters"));
+            .getProperty("numberOfClusters").trim());
         kmeans.setPreserveInstancesOrder(true);
         kmeans.setNumClusters(numberOfClusters);
         kmeans.buildClusterer(instances);

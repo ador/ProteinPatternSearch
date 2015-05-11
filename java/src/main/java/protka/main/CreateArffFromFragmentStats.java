@@ -14,7 +14,7 @@ import protka.stat.ProteinAminoAcidStats;
 public class CreateArffFromFragmentStats {
 
   private static final String[] requiredProps = { "inputFastaFile",
-      "outputArffFile" };
+      "proteinStatsArffFile" };
 
   public static void main(String args[]) {
     if (args.length != 1) {
@@ -34,7 +34,7 @@ public class CreateArffFromFragmentStats {
         is = new FileInputStream(
             properties.getProperty("inputFastaFile"));
         os = new FileOutputStream(
-            properties.getProperty("outputArffFile"));
+            properties.getProperty("proteinStatsArffFile"));
 
         FastaReader fastaReader = new FastaReader(is);
         ProteinAminoAcidStats fastaStats = new ProteinAminoAcidStats();

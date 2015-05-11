@@ -14,8 +14,8 @@ import protka.io.FastaReader;
 import protka.io.FastaWriter;
 
 public class CreateClusterFiles {
-  private static final String[] requiredProps = { "inputClusterFile",
-      "outputFilesName", "numberOfClusters", "inputFastaFile" };
+  private static final String[] requiredProps = { "wekaOutClusterPath",
+      "outputFastaFilesPrefix", "numberOfClusters", "inputFastaFile" };
 
   public static void main(String[] args) {
     if (args.length != 1) {
@@ -31,7 +31,7 @@ public class CreateClusterFiles {
         int numOfClusters = Integer.parseInt(properties
             .getProperty("numberOfClusters"));
         FileInputStream icluster = new FileInputStream(
-            properties.getProperty("inputClusterFile"));
+            properties.getProperty("wekaOutClusterPath"));
         FileInputStream ifasta = new FileInputStream(
             properties.getProperty("inputFastaFile"));
         List<FastaWriter> fastaWriters = new ArrayList<FastaWriter>();
@@ -40,8 +40,8 @@ public class CreateClusterFiles {
 
         FileOutputStream os;
         for (int i = 0; i < numOfClusters; ++i) {
-          os = new FileOutputStream(properties.getProperty("outputFilesName")
-              + i + ".cluster");
+          os = new FileOutputStream(properties.getProperty("outputFastaFilesPrefix")
+              + i + ".fasta");
           fastaWriters.add(new FastaWriter(os));
         }
 
