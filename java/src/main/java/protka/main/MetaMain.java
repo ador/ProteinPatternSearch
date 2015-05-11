@@ -6,7 +6,7 @@ public class MetaMain {
 
   public enum Task {
     COMPUTE_STATS, FILTER_DAT_FEATURES, FILTER_ROWS, FASTA_AND_DAT_FILTER, TM_STATS,
-    TM_EXT_FRAGMENTS, SPLIT_FASTA_TO_CLUSTERS, STATS_ARFF_FOR_WEKA
+    TM_EXT_FRAGMENTS, SPLIT_FASTA_TO_CLUSTERS, STATS_ARFF_FOR_WEKA, WEKA_CLUSTERING
   }
 
   public static void printHelp() {
@@ -36,6 +36,7 @@ public class MetaMain {
       case TM_EXT_FRAGMENTS: CutTmOutFragments.main(argsToPass); break;
       case STATS_ARFF_FOR_WEKA: CreateArffFromFragmentStats.main(argsToPass); break;
       case SPLIT_FASTA_TO_CLUSTERS: SplitFastaToClusters.main(argsToPass); break;
+      case WEKA_CLUSTERING: WekaClustering.main(argsToPass); break;
       default: printHelp(); break;
     }
   }
