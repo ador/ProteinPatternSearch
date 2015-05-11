@@ -10,6 +10,10 @@ public class SimpleWriter {
 
   private OutputStream os;
 
+  public SimpleWriter(OutputStream outputStream) {
+    os = outputStream;
+  }
+
   public void closeOS() throws IOException {
     os.flush();
     os.close();

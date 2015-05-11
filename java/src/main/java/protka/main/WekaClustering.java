@@ -7,15 +7,15 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Properties;
 
-import protka.io.ArffWriter;
+import protka.io.SimpleWriter;
 
 import weka.clusterers.SimpleKMeans;
 import weka.core.Instances;
 
 public class WekaClustering {
 
-  private static final String[] requiredProps = { "inputArffFile",
-      "numberOfClusters", "randomSeed", "outputClusterFile" };
+  private static final String[] requiredProps = { "proteinStatsArffFile",
+      "numberOfClusters", "randomSeed", "wekaOutClusterPath" };
 
   public static void main(String[] args) {
     if (args.length != 1) {
@@ -29,7 +29,7 @@ public class WekaClustering {
     if (propHandler.checkProps(properties)) {
       try {
         BufferedReader reader = new BufferedReader(new FileReader(
-            properties.getProperty("inputArffFile")));
+            properties.getProperty("proteinStatsArffFile")));
         Instances instances = new Instances(reader);
         reader.close();
 
@@ -49,21 +49,14 @@ public class WekaClustering {
         int[] assignments = kmeans.getAssignments();
 
         int i = 0;
-        if (properties.containsKey("outputClusterFile")) {
-          FileOutputStream os = new FileOutputStream(
-              properties.getProperty("outputClusterFile"));
-          ArffWriter arffWriter = new ArffWriter(os);
-          String line;
-          for (int clusterNum : assignments) {
-            line = i + "|" + clusterNum;
-            arffWriter.writeData(line);
-            i++;
-          }
-        } else {
-          for (int clusterNum : assignments) {
-            System.out.printf("%d|%d", i, clusterNum);
-            i++;
-          }
+        FileOutputStream os = new FileOutputStream(
+            properties.getProperty("wekaOutClusterPath"));
+        SimpleWriter clusWriter = new SimpleWriter(os);
+        String line;
+        for (int clusterNum : assignments) {
+          line = i + "|" + clusterNum;
+          clusWriter.writeData(line);
+          i++;
         }
 
       } catch (FileNotFoundException e) {
