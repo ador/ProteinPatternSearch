@@ -1,5 +1,6 @@
 package protka.main;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -17,6 +18,12 @@ public class CreateClusterFiles {
   private static final String[] requiredProps = { "wekaOutClusterPath",
       "outputFastaFilesPrefix", "numberOfClusters", "inputFastaFile" };
 
+  private static void createOutDir(String outFastaPrefix) throws IOException {
+    String outDir = outFastaPrefix.substring(0, outFastaPrefix.lastIndexOf(File.separator));
+    File targetFile = new File(outDir); 
+    targetFile.mkdirs();
+  }
+      
   public static void main(String[] args) {
     if (args.length != 1) {
       System.out.println("Usage: CreateArff prop.properties");
@@ -30,6 +37,7 @@ public class CreateClusterFiles {
       try {
         int numOfClusters = Integer.parseInt(properties
             .getProperty("numberOfClusters"));
+        createOutDir(properties.getProperty("outputFastaFilesPrefix"));
         FileInputStream icluster = new FileInputStream(
             properties.getProperty("wekaOutClusterPath"));
         FileInputStream ifasta = new FileInputStream(
