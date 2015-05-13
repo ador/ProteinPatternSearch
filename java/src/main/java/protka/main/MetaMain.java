@@ -5,7 +5,7 @@ import java.io.IOException;
 public class MetaMain {
 
   public enum Task {
-    COMPUTE_STATS, FILTER_DAT_FEATURES, FILTER_ROWS, FASTA_AND_DAT_FILTER, TM_STATS,
+    COMPUTE_STATS, FILTER_DAT_ROWS, FASTA_AND_DAT_FILTER, TM_STATS,
     TM_EXT_FRAGMENTS, SPLIT_FASTA_TO_CLUSTERS_KCLUST, STATS_ARFF_FOR_WEKA, WEKA_CLUSTERING,
     SPLIT_FASTA_TO_CLUSTERS_WEKA
   }
@@ -30,8 +30,7 @@ public class MetaMain {
 
     switch (whichTask) {
       case COMPUTE_STATS: ComputeHDStats.main(argsToPass); break;
-      case FILTER_DAT_FEATURES: FilteringDat.main(argsToPass); break;
-      case FILTER_ROWS: FilterRows.main(argsToPass); break;
+      case FILTER_DAT_ROWS: FilterRows.main(argsToPass); break;
       case FASTA_AND_DAT_FILTER: MainProteinFilter.main(argsToPass); break;
       case TM_STATS: TransmemStats.main(argsToPass); break;
       case TM_EXT_FRAGMENTS: CutTmOutFragments.main(argsToPass); break;
