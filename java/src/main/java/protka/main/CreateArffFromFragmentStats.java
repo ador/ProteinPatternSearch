@@ -16,6 +16,14 @@ public class CreateArffFromFragmentStats {
   private static final String[] requiredProps = { "inputFastaFile",
       "proteinStatsArffFile" };
 
+  private void createOutDirsAndFile(String outFilePath) throws IOException {
+    String outFileDir = outFilePath.substring(0, outFilePath.lastIndexOf(File.separator));
+    File targetFile = new File(outFileDir); 
+    targetFile.mkdirs();
+    os = new FileOutputStream(outFilePath);
+  }
+
+      
   public static void main(String args[]) {
     if (args.length != 1) {
       System.out.println("Usage: CreateArffFromFragmentStats prop.properties");
@@ -23,14 +31,15 @@ public class CreateArffFromFragmentStats {
     }
 
     PropertyHandler propHandler = new PropertyHandler(requiredProps);
-
+    Properties properties;
     FileInputStream is;
     FileOutputStream os;
-
+    
     try {
-      Properties properties = propHandler.readPropertiesFile(args[0]);
+      properties = propHandler.readPropertiesFile(args[0]);
 
       if (propHandler.checkProps(properties)) {
+        createOutDirsAndFile(properties.getProperty("outputDatFile"));
         is = new FileInputStream(
             properties.getProperty("inputFastaFile"));
         os = new FileOutputStream(
