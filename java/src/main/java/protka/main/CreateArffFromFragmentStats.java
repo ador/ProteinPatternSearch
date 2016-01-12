@@ -1,5 +1,6 @@
 package protka.main;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -16,13 +17,12 @@ public class CreateArffFromFragmentStats {
   private static final String[] requiredProps = { "inputFastaFile",
       "proteinStatsArffFile" };
 
-  private void createOutDirsAndFile(String outFilePath) throws IOException {
+  private static FileOutputStream createOutDirsAndFile(String outFilePath) throws IOException {
     String outFileDir = outFilePath.substring(0, outFilePath.lastIndexOf(File.separator));
     File targetFile = new File(outFileDir); 
     targetFile.mkdirs();
-    os = new FileOutputStream(outFilePath);
+    return new FileOutputStream(outFilePath);
   }
-
       
   public static void main(String args[]) {
     if (args.length != 1) {
@@ -37,13 +37,10 @@ public class CreateArffFromFragmentStats {
     
     try {
       properties = propHandler.readPropertiesFile(args[0]);
-
       if (propHandler.checkProps(properties)) {
-        createOutDirsAndFile(properties.getProperty("outputDatFile"));
         is = new FileInputStream(
             properties.getProperty("inputFastaFile"));
-        os = new FileOutputStream(
-            properties.getProperty("proteinStatsArffFile"));
+        os = createOutDirsAndFile(properties.getProperty("proteinStatsArffFile"));
 
         FastaReader fastaReader = new FastaReader(is);
         ProteinAminoAcidStats fastaStats = new ProteinAminoAcidStats();
