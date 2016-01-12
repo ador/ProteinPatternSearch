@@ -53,7 +53,7 @@ public class CreateArffFromFragmentStats {
           arffWriter.writeData(fastaStats.computeCsvStatsString(fastaItem));
           fastaItem = fastaReader.getNextFastaItem();
           ++counter;
-          if (counter % 2 == 0) {
+          if (counter % 1000 == 0) {
             System.out.println("Read and wrote " + counter + " fasta items.");
           }
         }
