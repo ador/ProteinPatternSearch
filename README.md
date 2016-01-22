@@ -33,7 +33,7 @@ cies for each protein(fragment).
 input and output paths, mandatory parameters are: numberOfClusters and
 randomSeed.
  * `SPLIT_FASTA_TO_CLUSTERS_WEKA`: This task is very similar to the
-task “SPLIT FASTA TO CLUSTERS KCLUST”, but works with Weka
+task "`SPLIT_FASTA_TO_CLUSTERS_KCLUST`", but it works with Weka
 output files instead of kClust results.
 
 ## How to use
@@ -41,6 +41,8 @@ output files instead of kClust results.
 TODO
 
 ### A) Compile and run
+
+gradle build
 
 
 ### B) Run the whole pipeline
