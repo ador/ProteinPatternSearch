@@ -3,7 +3,7 @@ ProteinPatternSearch
 
 This repository includes Java classes that do the pre-processing steps
 of filtering transmembrane protein fragments from the SwissProt protein database.
-Project details can be read in Chapter 5 of [my thesis](https://info.ilab.sztaki.hu/~aszabo/aszabo_thesis.pdf)
+Project details can be read in Chapter 5 of [my dissertation](https://www.dropbox.com/s/cow9vys7wrl1kqj/thesis_aszabo.pdf?dl=0)
 
 #### The tasks this software package is able to perform are:
 
@@ -38,14 +38,17 @@ output files instead of kClust results.
 
 ## How to use
 
-TODO
+### A) Compile
 
-### A) Compile and run
+To compile the java project, first get [Gradle](http://gradle.org/) (version 1.6 or above), and the run:
 
-gradle build
+    gradle build
 
 
 ### B) Run the whole pipeline
+
+The easiest way to get a working example is to follow the scripts and configs as described in my [dissertation](https://www.dropbox.com/s/cow9vys7wrl1kqj/thesis_aszabo.pdf?dl=0). There you will see where are the lines in the configs that should be changed to execute the programs on your files, with your parameters.
+
 
 
 
